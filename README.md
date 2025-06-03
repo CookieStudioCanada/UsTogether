@@ -1,6 +1,6 @@
 # UsTogether - Couple's Shared Space App
 
-A beautiful web application designed for couples to manage their shared life together.
+A beautiful web application designed for couples to manage their shared life together. Please note that this app is in development.
 
 ## ✨ Features
 
@@ -15,16 +15,6 @@ A beautiful web application designed for couples to manage their shared life tog
 
 - French (Français)
 - English
-
-## 🚀 Getting Started
-
-1. Clone or download this repository
-2. Open a terminal in the project directory
-3. Start a local server:
-   ```bash
-   python3 -m http.server 8001
-   ```
-4. Open http://localhost:8001 in your browser
 
 ## 📁 Project Structure
 
@@ -48,7 +38,3 @@ UsTogether/
 ## 💝 Made with Love
 
 Perfect for couples who want to organize their life together in a beautiful, romantic interface.
-
----
-
-*Start sharing your life more beautifully with UsTogether* ❤️ 
