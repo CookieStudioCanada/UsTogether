@@ -1,6 +1,44 @@
 // Initialize Quill editor
 let quillEditor;
 
+// Auto-detect category based on description
+function detectCategory(description) {
+    const desc = description.toLowerCase().trim();
+    
+    // Épicerie patterns
+    if (/\b(épicerie|grocery|marché|supermarché|iga|metro|provigo|loblaws|walmart|costco|maxi|nourriture|courses|alimentation|légumes|fruits|viande|pain|lait|œufs|fromage)\b/i.test(desc)) {
+        return 'epicerie';
+    }
+    
+    // Restaurant patterns
+    if (/\b(restaurant|resto|mcdonald|burger|pizza|sushi|café|bar|dîner|souper|déjeuner|livraison|uber eats|doordash|skip|takeout|fast food)\b/i.test(desc)) {
+        return 'restaurants';
+    }
+    
+    // Transport patterns
+    if (/\b(essence|gas|station|esso|shell|petro|transport|bus|métro|taxi|uber|bolt|train|avion|parking|stationnement|auto|voiture|réparation auto)\b/i.test(desc)) {
+        return 'transport';
+    }
+    
+    // Divertissement patterns
+    if (/\b(cinéma|théâtre|concert|netflix|spotify|jeu|game|divertissement|entertainment|sortie|loisir|hobby|livre|film|musique)\b/i.test(desc)) {
+        return 'divertissement';
+    }
+    
+    // Dépenses maison patterns
+    if (/\b(électricité|hydro|internet|bell|videotron|télé|cable|chauffage|climatisation|rénovation|réparation|outil|canadian tire|home depot|rona|meubles|décoration|nettoyage)\b/i.test(desc)) {
+        return 'depenses-maison';
+    }
+    
+    // Prêt maison patterns
+    if (/\b(hypothèque|mortgage|prêt|loan|banque|intérêt|capital|payment|versement|crédit)\b/i.test(desc)) {
+        return 'pret-maison';
+    }
+    
+    // Default to "autre" if no pattern matches
+    return 'autre';
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize Quill with toolbar at bottom
     quillEditor = new Quill('#quillEditor', {
@@ -38,6 +76,23 @@ document.addEventListener('DOMContentLoaded', function() {
         expenseDateField.value = today;
     }
     
+    // Real-time category detection
+    const expenseDescField = document.getElementById('expense-description');
+    const expenseCategoryField = document.getElementById('expense-category');
+    if (expenseDescField && expenseCategoryField) {
+        expenseDescField.addEventListener('input', function() {
+            const description = this.value;
+            // Only auto-detect if category is still empty/unselected
+            if (description && !expenseCategoryField.value) {
+                const detectedCategory = detectCategory(description);
+                // Only set if detection finds a specific category (not 'autre')
+                if (detectedCategory && detectedCategory !== 'autre') {
+                    expenseCategoryField.value = detectedCategory;
+                }
+            }
+        });
+    }
+    
     // Generate initial calendar
     generateCalendar(currentMonth, currentYear);
     
@@ -45,6 +100,102 @@ document.addEventListener('DOMContentLoaded', function() {
     if (window.i18n) {
         window.i18n.updateInterface();
     }
+    
+    // Expense form
+    const expenseForm = document.getElementById('expense-form');
+    if (expenseForm) {
+        expenseForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const description = document.getElementById('expense-description').value;
+            const amount = document.getElementById('expense-amount').value;
+            let category = document.getElementById('expense-category').value;
+            const payer = document.getElementById('expense-payer').value;
+            const date = document.getElementById('expense-date').value;
+            const recurrence = document.getElementById('expense-recurrence').value;
+            
+            // Auto-detect category if not selected
+            if (!category && description) {
+                category = detectCategory(description);
+            }
+            
+            // Category is no longer required - will default to 'autre' if not detected
+            if (description && amount && payer && date) {
+                addExpenseToList(description, amount, category || 'autre', payer, date, recurrence);
+                this.reset();
+                // Reset today's date
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('expense-date').value = today;
+            }
+        });
+    }
+
+
+
+    // Grocery form
+    const groceryForm = document.getElementById('grocery-form');
+    if (groceryForm) {
+        groceryForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const item = document.getElementById('grocery-item').value;
+            const category = document.getElementById('grocery-category').value;
+            
+            if (item) {
+                addGroceryItem(item, category);
+                this.reset();
+            }
+        });
+    }
+
+    // Event form
+    const eventForm = document.getElementById('event-form');
+    if (eventForm) {
+        eventForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('event-name').value;
+            const date = document.getElementById('event-date').value;
+            const time = document.getElementById('event-time').value;
+            const description = document.getElementById('event-description').value;
+            
+            if (name && date) {
+                // Combine date and time, or use just date if no time provided
+                const datetime = time ? `${date}T${time}` : `${date}T00:00`;
+                addEventToList(name, datetime, description, time ? true : false);
+                this.reset();
+                // Regenerate calendar to show new event
+                generateCalendar(currentMonth, currentYear);
+            }
+        });
+    }
+
+    // Custom list form
+    const customListForm = document.getElementById('custom-list-form');
+    if (customListForm) {
+        customListForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const listName = document.getElementById('custom-list-name').value;
+            
+            if (listName) {
+                createCustomList(listName);
+                this.reset();
+            }
+        });
+    }
+
+    // Initialize sample events if none exist
+    initializeSampleEvents();
+    
+    // Load existing events into the UI
+    loadExistingEvents();
+    
+    // Initialize calendar with current month
+    generateCalendar(currentMonth, currentYear);
+    
+    // Initialize grocery items
+    initializeGroceryItems();
     
     console.log('UsTogether app initialized!');
 });
@@ -117,6 +268,9 @@ function generateCalendar(month, year) {
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const today = new Date();
     
+    // Get stored events
+    const events = JSON.parse(localStorage.getItem('events') || '[]');
+    
     let html = '';
     
     // Add day headers
@@ -139,10 +293,19 @@ function generateCalendar(month, year) {
         if (year === today.getFullYear() && month === today.getMonth() && day === today.getDate()) {
             classes += ' today';
         }
-        // Add sample events
-        if (day === 15 || day === 22) {
+        
+        // Check if this day has any events
+        const hasEvent = events.some(event => {
+            const eventDate = new Date(event.datetime);
+            return eventDate.getFullYear() === year && 
+                   eventDate.getMonth() === month && 
+                   eventDate.getDate() === day;
+        });
+        
+        if (hasEvent) {
             classes += ' has-event';
         }
+        
         html += `<div class="${classes}">${day}</div>`;
     }
     
@@ -175,6 +338,95 @@ function changeMonth(direction) {
     generateCalendar(currentMonth, currentYear);
 }
 
+// Initialize sample events with real dates
+function initializeSampleEvents() {
+    const existingEvents = JSON.parse(localStorage.getItem('events') || '[]');
+    
+    // Only add sample events if none exist
+    if (existingEvents.length === 0) {
+        const today = new Date();
+        const sampleEvents = [
+            {
+                id: Date.now() + 1,
+                name: 'Soirée cinéma',
+                datetime: new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1, 20, 0).toISOString().slice(0, 16),
+                description: 'Regarder le nouveau film ensemble',
+                hasTime: true,
+                timestamp: new Date().toISOString()
+            },
+            {
+                id: Date.now() + 2,
+                name: 'Dîner d\'anniversaire',
+                datetime: new Date(today.getFullYear(), today.getMonth(), today.getDate() + 3, 19, 30).toISOString().slice(0, 16),
+                description: 'Célébrer notre anniversaire de rencontre',
+                hasTime: true,
+                timestamp: new Date().toISOString()
+            },
+            {
+                id: Date.now() + 3,
+                name: 'Cours de yoga ensemble',
+                datetime: new Date(today.getFullYear(), today.getMonth(), today.getDate() + 6, 10, 0).toISOString().slice(0, 16),
+                description: 'Séance de yoga en couple',
+                hasTime: true,
+                timestamp: new Date().toISOString()
+            },
+            {
+                id: Date.now() + 4,
+                name: 'Week-end romantique',
+                datetime: new Date(today.getFullYear(), today.getMonth(), today.getDate() + 12).toISOString().slice(0, 10) + 'T00:00',
+                description: 'Escapade romantique à la montagne',
+                hasTime: false,
+                timestamp: new Date().toISOString()
+            },
+            {
+                id: Date.now() + 5,
+                name: 'Visite chez les parents',
+                datetime: new Date(today.getFullYear(), today.getMonth(), today.getDate() + 8, 14, 0).toISOString().slice(0, 16),
+                description: 'Déjeuner dominical en famille',
+                hasTime: true,
+                timestamp: new Date().toISOString()
+            }
+        ];
+        
+        // Store sample events
+        localStorage.setItem('events', JSON.stringify(sampleEvents));
+    }
+}
+
+// Load existing events from localStorage and display them
+function loadExistingEvents() {
+    const events = JSON.parse(localStorage.getItem('events') || '[]');
+    const eventsList = document.getElementById('events-list');
+    
+    if (eventsList && events.length > 0) {
+        // Clear existing events in the UI
+        eventsList.innerHTML = '';
+        
+        // Sort events by date (earliest first)
+        events.sort((a, b) => new Date(a.datetime) - new Date(b.datetime));
+        
+        events.forEach(event => {
+            const eventDate = new Date(event.datetime);
+            const formattedDate = event.hasTime ? 
+                eventDate.toLocaleDateString() + ', ' + eventDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) :
+                eventDate.toLocaleDateString();
+            
+            const eventItem = document.createElement('div');
+            eventItem.className = 'event-item';
+            eventItem.innerHTML = `
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong>${event.name}</strong>
+                        <br><small><i class="fas fa-${event.hasTime ? 'clock' : 'calendar'}"></i> ${formattedDate}</small>
+                        ${event.description ? `<br><small class="text-muted">${event.description}</small>` : ''}
+                    </div>
+                </div>
+            `;
+            eventsList.appendChild(eventItem);
+        });
+    }
+}
+
 // Navigation functionality
 function showView(viewId) {
     // Hide all views
@@ -187,12 +439,16 @@ function showView(viewId) {
         targetView.classList.add('active');
     }
     
-    // Update active nav link
+    // Update active nav link based on viewId
     const navLinks = document.querySelectorAll('.nav-link');
-    navLinks.forEach(link => link.classList.remove('active'));
-    if (event && event.target) {
-        event.target.classList.add('active');
-    }
+    navLinks.forEach(link => {
+        link.classList.remove('active');
+        // Check if this link's onclick matches the current viewId
+        const onclick = link.getAttribute('onclick');
+        if (onclick && onclick.includes(`'${viewId}'`)) {
+            link.classList.add('active');
+        }
+    });
     
     // Generate calendar if calendar view is shown
     if (viewId === 'calendar') {
@@ -205,25 +461,7 @@ function showView(viewId) {
     }
 }
 
-// List tab functionality
-function showListTab(tabId) {
-    // Hide all tab contents
-    const tabs = document.querySelectorAll('.tab-content');
-    tabs.forEach(tab => tab.classList.remove('active'));
-    
-    // Show selected tab
-    const targetTab = document.getElementById(tabId + '-tab');
-    if (targetTab) {
-        targetTab.classList.add('active');
-    }
-    
-    // Update active tab button
-    const tabButtons = document.querySelectorAll('.list-tab');
-    tabButtons.forEach(button => button.classList.remove('active'));
-    if (event && event.target) {
-        event.target.classList.add('active');
-    }
-}
+
 
 // Mobile sidebar toggle
 function toggleSidebar() {
@@ -238,105 +476,23 @@ function toggleSidebar() {
     }
 }
 
-// Form submission handlers
-document.addEventListener('DOMContentLoaded', function() {
-    // Expense form
-    const expenseForm = document.getElementById('expense-form');
-    if (expenseForm) {
-        expenseForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const description = document.getElementById('expense-description').value;
-            const amount = document.getElementById('expense-amount').value;
-            const category = document.getElementById('expense-category').value;
-            const payer = document.getElementById('expense-payer').value;
-            const date = document.getElementById('expense-date').value;
-            const recurrence = document.getElementById('expense-recurrence').value;
-            
-            if (description && amount && category && payer && date) {
-                addExpenseToList(description, amount, category, payer, date, recurrence);
-                this.reset();
-                // Reset today's date
-                const today = new Date().toISOString().split('T')[0];
-                document.getElementById('expense-date').value = today;
-            }
-        });
-    }
-
-    // Task form - simplified without priority, flag, and assignee
-    const taskForm = document.getElementById('task-form');
-    if (taskForm) {
-        taskForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const title = document.getElementById('task-title').value;
-            const description = document.getElementById('task-description').value;
-            const date = document.getElementById('task-date').value;
-            
-            if (title) {
-                addTaskToList(title, description, date);
-                this.reset();
-            }
-        });
-    }
-
-    // Grocery form
-    const groceryForm = document.getElementById('grocery-form');
-    if (groceryForm) {
-        groceryForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const item = document.getElementById('grocery-item').value;
-            
-            if (item) {
-                addGroceryItem(item);
-                this.reset();
-            }
-        });
-    }
-
-    // Event form
-    const eventForm = document.getElementById('event-form');
-    if (eventForm) {
-        eventForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const name = document.getElementById('event-name').value;
-            const datetime = document.getElementById('event-datetime').value;
-            const description = document.getElementById('event-description').value;
-            const participants = document.getElementById('event-participants').value;
-            
-            if (name && datetime) {
-                addEventToList(name, datetime, description, participants);
-                this.reset();
-            }
-        });
-    }
-
-    // Custom list form
-    const customListForm = document.getElementById('custom-list-form');
-    if (customListForm) {
-        customListForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const listName = document.getElementById('custom-list-name').value;
-            
-            if (listName) {
-                createCustomList(listName);
-                this.reset();
-            }
-        });
-    }
-});
-
 function addExpenseToList(description, amount, category, payer, date, recurrence) {
     const expensesList = document.getElementById('expenses-list');
     const newExpense = document.createElement('div');
     newExpense.className = 'expense-item';
     newExpense.setAttribute('data-category', category);
     
-    const payerText = payer === 'you' ? 'You' : 'Partner';
+    // Store raw data - no translation
+    const payerDisplayText = payer === 'you' ? 'Vous' : 'Partenaire';
     const oweAmount = (amount / 2).toFixed(2);
+    
+    // Fix the payment logic: if YOU paid, then PARTNER owes you
+    let debtText;
+    if (payer === 'you') {
+        debtText = `<small class="text-success">Partenaire doit : $${oweAmount}</small>`;
+    } else {
+        debtText = `<small class="text-muted">Vous devez : $${oweAmount}</small>`;
+    }
     
     // Get category info
     const categoryInfo = getCategoryInfo(category);
@@ -345,89 +501,161 @@ function addExpenseToList(description, amount, category, payer, date, recurrence
     const recurrenceInfo = getRecurrenceInfo(recurrence);
     const recurrenceText = recurrence ? ` • ${recurrenceInfo}` : '';
     
+    // Create expense entry with raw data
+    const expenseData = {
+        id: Date.now(),
+        description: description, // Raw description as entered
+        amount: parseFloat(amount),
+        category: category, // Raw category value
+        payer: payer, // Raw payer value
+        date: date,
+        recurrence: recurrence || null,
+        timestamp: new Date().toISOString()
+    };
+    
+    // Store in localStorage for persistence
+    const expenses = JSON.parse(localStorage.getItem('expenses') || '[]');
+    expenses.unshift(expenseData);
+    localStorage.setItem('expenses', JSON.stringify(expenses));
+    
     newExpense.innerHTML = `
         <div class="d-flex justify-content-between align-items-center">
             <div>
-                <span class="category-badge category-${category}">${categoryInfo}</span>
                 <strong>${description}</strong>
-                <br><small>Paid by ${payerText} • Split equally • ${date}${recurrenceText}</small>
+                <span class="category-badge category-${category}">${categoryInfo}</span>
+                <br><small>Payé par ${payerDisplayText} • Partagé équitablement • ${date}${recurrenceText}</small>
             </div>
             <div class="text-end">
                 <div class="fw-bold">$${amount}</div>
-                <small class="text-muted">You owe: $${oweAmount}</small>
+                ${debtText}
             </div>
         </div>
     `;
     expensesList.insertBefore(newExpense, expensesList.firstChild);
 }
 
-// Simplified task function without priority, flag, and assignee
-function addTaskToList(title, description, date) {
-    const todosList = document.getElementById('todos-list');
-    const newTask = document.createElement('div');
-    const taskId = 'task' + Date.now();
-    
-    newTask.className = 'task-item';
-    
-    const dateText = date ? ` • Due: ${date}` : '';
-    
-    newTask.innerHTML = `
-        <div class="d-flex justify-content-between align-items-center">
-            <div class="flex-grow-1">
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="${taskId}">
-                    <label class="form-check-label" for="${taskId}">
-                        <strong>${title}</strong>
-                        ${description ? `<br><small>${description}</small>` : ''}
-                        <br><small class="text-muted">Added just now${dateText}</small>
-                    </label>
-                </div>
-            </div>
-        </div>
-    `;
-    todosList.insertBefore(newTask, todosList.firstChild);
-}
 
-function addGroceryItem(item) {
-    const groceryList = document.getElementById('grocery-list');
-    const newItem = document.createElement('div');
+
+function addGroceryItem(item, selectedCategory = '') {
+    // Auto-detect category if none selected
+    const category = selectedCategory || detectGroceryCategory(item);
     const itemId = 'grocery' + Date.now();
     
-    newItem.className = 'grocery-item';
+    // Store item in localStorage
+    const groceryItems = JSON.parse(localStorage.getItem('groceryItems') || '[]');
+    const newItemData = {
+        id: itemId,
+        name: item,
+        category: category,
+        completed: false,
+        timestamp: new Date().toISOString()
+    };
+    groceryItems.push(newItemData);
+    localStorage.setItem('groceryItems', JSON.stringify(groceryItems));
     
-    newItem.innerHTML = `
-        <div class="form-check">
-            <input class="form-check-input" type="checkbox" id="${itemId}">
-            <label class="form-check-label" for="${itemId}">
-                <strong>${item}</strong>
-            </label>
-        </div>
-        <div>
-            <button class="btn btn-sm btn-outline-danger" onclick="removeGroceryItem(this)">
-                <i class="fas fa-trash"></i>
-            </button>
-        </div>
-    `;
-    groceryList.insertBefore(newItem, groceryList.firstChild);
+    // Refresh the display
+    displayGroceryItems();
 }
 
-function addEventToList(name, datetime, description, participants) {
+function displayGroceryItems() {
+    const groceryList = document.getElementById('grocery-list');
+    const groceryItems = JSON.parse(localStorage.getItem('groceryItems') || '[]');
+    
+    // Group items by category
+    const groupedItems = {};
+    const categoryOrder = ['fruits-legumes', 'boulangerie', 'viandes', 'congeles', 'laitiers', 'epicerie', 'autre'];
+    
+    groceryItems.forEach(item => {
+        if (!groupedItems[item.category]) {
+            groupedItems[item.category] = [];
+        }
+        groupedItems[item.category].push(item);
+    });
+    
+    let html = '';
+    
+    categoryOrder.forEach(category => {
+        if (groupedItems[category] && groupedItems[category].length > 0) {
+            const categoryInfo = getGroceryCategoryInfo(category);
+            html += `
+                <div class="grocery-category-section" data-category="${category}">
+                    <h6 class="grocery-category-title">${categoryInfo}</h6>
+            `;
+            
+            groupedItems[category].forEach(item => {
+                html += `
+                    <div class="grocery-item ${item.completed ? 'completed' : ''}" data-category="${category}" data-id="${item.id}">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="${item.id}" ${item.completed ? 'checked' : ''} onchange="toggleGroceryItem('${item.id}')">
+                            <label class="form-check-label" for="${item.id}">
+                                <strong>${item.name}</strong>
+                            </label>
+                        </div>
+                        <div>
+                            <button class="btn btn-sm btn-outline-danger" onclick="removeGroceryItem('${item.id}')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+        }
+    });
+    
+    groceryList.innerHTML = html;
+}
+
+function toggleGroceryItem(itemId) {
+    const groceryItems = JSON.parse(localStorage.getItem('groceryItems') || '[]');
+    const itemIndex = groceryItems.findIndex(item => item.id === itemId);
+    
+    if (itemIndex !== -1) {
+        groceryItems[itemIndex].completed = !groceryItems[itemIndex].completed;
+        localStorage.setItem('groceryItems', JSON.stringify(groceryItems));
+        displayGroceryItems();
+    }
+}
+
+function removeGroceryItem(itemId) {
+    const groceryItems = JSON.parse(localStorage.getItem('groceryItems') || '[]');
+    const filteredItems = groceryItems.filter(item => item.id !== itemId);
+    localStorage.setItem('groceryItems', JSON.stringify(filteredItems));
+    displayGroceryItems();
+}
+
+function addEventToList(name, datetime, description, hasTime = true) {
     const eventsList = document.getElementById('events-list');
     const newEvent = document.createElement('div');
     newEvent.className = 'event-item';
     
     const date = new Date(datetime);
-    const formattedDate = date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+    // Format date with or without time based on hasTime flag
+    const formattedDate = hasTime ? 
+        date.toLocaleDateString() + ', ' + date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) :
+        date.toLocaleDateString();
+    
+    // Store event in localStorage
+    const eventData = {
+        id: Date.now(),
+        name: name,
+        datetime: datetime,
+        description: description || '',
+        hasTime: hasTime,
+        timestamp: new Date().toISOString()
+    };
+    
+    const events = JSON.parse(localStorage.getItem('events') || '[]');
+    events.unshift(eventData);
+    localStorage.setItem('events', JSON.stringify(events));
     
     newEvent.innerHTML = `
         <div class="d-flex justify-content-between align-items-center">
             <div>
                 <strong>${name}</strong>
-                <br><small><i class="fas fa-clock"></i> ${formattedDate}</small>
+                <br><small><i class="fas fa-${hasTime ? 'clock' : 'calendar'}"></i> ${formattedDate}</small>
                 ${description ? `<br><small class="text-muted">${description}</small>` : ''}
-            </div>
-            <div>
-                <span class="badge bg-primary">New</span>
             </div>
         </div>
     `;
@@ -436,14 +664,104 @@ function addEventToList(name, datetime, description, participants) {
 
 function getCategoryInfo(category) {
     const categories = {
-        'food': '🍕 Food',
+        'epicerie': '🛒 Épicerie',
+        'pret-maison': '🏠 Prêt maison',
+        'restaurants': '🍽️ Restaurants',
         'transport': '🚗 Transport',
-        'entertainment': '🎬 Entertainment',
-        'utilities': '💡 Utilities',
-        'shopping': '🛍️ Shopping',
-        'other': '📦 Other'
+        'divertissement': '🎬 Divertissement',
+        'depenses-maison': '🏡 Dépenses maison',
+        'autre': '📦 Autre'
     };
     return categories[category] || category;
+}
+
+function getGroceryCategoryInfo(category) {
+    const categories = {
+        'fruits-legumes': '🍎 Fruits/Légumes',
+        'boulangerie': '🥖 Boulangerie',
+        'viandes': '🥩 Viandes',
+        'congeles': '🧊 Congelés',
+        'laitiers': '🥛 Laitiers',
+        'epicerie': '🛒 Épicerie',
+        'autre': '📦 Autre'
+    };
+    return categories[category] || '📦 Autre';
+}
+
+function detectGroceryCategory(item) {
+    const itemLower = item.toLowerCase();
+    
+    // Fruits/Légumes
+    if (itemLower.match(/\b(pomme|poire|banane|orange|citron|lime|fraise|raisin|ananas|melon|pastèque|pêche|abricot|kiwi|mangue|avocat|tomate|carotte|pomme de terre|oignon|ail|poivron|courgette|aubergine|brocoli|chou|épinard|laitue|salade|concombre|radis|betterave|navet|céleri|persil|coriandre|basilic|menthe|légume|fruit|bio|organique)\b/)) {
+        return 'fruits-legumes';
+    }
+    
+    // Boulangerie
+    if (itemLower.match(/\b(pain|baguette|croissant|brioche|viennoiserie|pâtisserie|gâteau|tarte|muffin|bagel|tortilla|wrap|pita|naan|focaccia|biscuit|cracker|céréale|avoine|granola|müesli|farine|levure|sucre|cassonade|miel|sirop|confiture|nutella|beurre d'arachide)\b/)) {
+        return 'boulangerie';
+    }
+    
+    // Viandes
+    if (itemLower.match(/\b(bœuf|porc|agneau|veau|poulet|dinde|canard|saumon|thon|morue|crevette|homard|crabe|poisson|viande|steak|côtelette|rôti|jambon|bacon|saucisse|chorizo|pepperoni|salami|prosciutto|pâté|foie gras|escalope|filet|cuisse|aile|poitrine)\b/)) {
+        return 'viandes';
+    }
+    
+    // Congelés
+    if (itemLower.match(/\b(congelé|surgelé|glace|crème glacée|sorbet|pizza congelée|légumes congelés|fruits congelés|poisson congelé|viande congelée|glaçon|ice cream)\b/)) {
+        return 'congeles';
+    }
+    
+    // Laitiers
+    if (itemLower.match(/\b(lait|fromage|yaourt|yogourt|crème|beurre|margarine|œuf|oeuf|mozzarella|cheddar|parmesan|feta|brie|camembert|cottage|ricotta|mascarpone|crème fraîche|crème sure|babeurre|kéfir)\b/)) {
+        return 'laitiers';
+    }
+    
+    // Épicerie (items généraux d'épicerie)
+    if (itemLower.match(/\b(riz|pâtes|nouilles|quinoa|couscous|bulgur|orge|lentille|haricot|pois chiche|conserve|sauce|huile|vinaigre|épice|sel|poivre|thé|café|jus|eau|soda|bière|vin|shampoing|savon|dentifrice|détergent|papier|essuie-tout|mouchoir|sac poubelle|aluminium|pellicule plastique)\b/)) {
+        return 'epicerie';
+    }
+    
+    // Default category
+    return 'autre';
+}
+
+function filterGroceryByCategory(category) {
+    const categorySections = document.querySelectorAll('.grocery-category-section');
+    
+    // Update dropdown button text
+    const dropdownButton = document.querySelector('.grocery-filter .dropdown-toggle');
+    if (dropdownButton && event && event.target) {
+        const selectedText = event.target.textContent;
+        dropdownButton.innerHTML = `<i class="fas fa-filter me-1"></i>${selectedText}`;
+    }
+    
+    categorySections.forEach(section => {
+        if (category === 'all' || section.getAttribute('data-category') === category) {
+            section.style.display = 'block';
+        } else {
+            section.style.display = 'none';
+        }
+    });
+}
+
+function initializeGroceryItems() {
+    // Initialize with sample data if no items exist
+    const existingItems = JSON.parse(localStorage.getItem('groceryItems') || '[]');
+    
+    if (existingItems.length === 0) {
+        const sampleItems = [
+            { id: 'grocery1', name: 'Lait bio - 1 litre', category: 'laitiers', completed: false },
+            { id: 'grocery2', name: 'Pain complet', category: 'boulangerie', completed: false },
+            { id: 'grocery3', name: 'Pommes de terre - 2 kg', category: 'fruits-legumes', completed: false },
+            { id: 'grocery4', name: 'Saumon frais - 400g', category: 'viandes', completed: false },
+            { id: 'grocery5', name: 'Œufs - 12 unités', category: 'laitiers', completed: true },
+            { id: 'grocery6', name: 'Fromage de chèvre', category: 'laitiers', completed: false }
+        ];
+        
+        localStorage.setItem('groceryItems', JSON.stringify(sampleItems));
+    }
+    
+    displayGroceryItems();
 }
 
 function getRecurrenceInfo(recurrence) {
@@ -486,13 +804,8 @@ function filterByCategory() {
     });
 }
 
-function removeGroceryItem(button) {
-    button.closest('.grocery-item').remove();
-}
-
 function showGroceryList() {
-    showView('lists');
-    showListTab('grocery');
+    showView('grocery');
 }
 
 // Quick action functions (for backward compatibility)
@@ -502,7 +815,6 @@ function showAddExpenseForm() {
 
 function showAddTaskForm() {
     showView('lists');
-    showListTab('todos');
 }
 
 function showAddEventForm() {
@@ -513,25 +825,16 @@ function openList(listType) {
     alert(`Opening ${listType} list. This feature will be expanded with full CRUD functionality when connected to Firebase.`);
 }
 
-// Grocery item completion handling
+// Task item completion handling
 document.addEventListener('change', function(e) {
-    if (e.target.type === 'checkbox') {
-        if (e.target.closest('.task-item')) {
-            const taskItem = e.target.closest('.task-item');
-            if (e.target.checked) {
-                taskItem.style.opacity = '0.6';
-                taskItem.style.textDecoration = 'line-through';
-                setTimeout(() => {
-                    taskItem.remove();
-                }, 1000);
-            }
-        } else if (e.target.closest('.grocery-item')) {
-            const groceryItem = e.target.closest('.grocery-item');
-            if (e.target.checked) {
-                groceryItem.classList.add('completed');
-            } else {
-                groceryItem.classList.remove('completed');
-            }
+    if (e.target.type === 'checkbox' && e.target.closest('.task-item')) {
+        const taskItem = e.target.closest('.task-item');
+        if (e.target.checked) {
+            taskItem.style.opacity = '0.6';
+            taskItem.style.textDecoration = 'line-through';
+            setTimeout(() => {
+                taskItem.remove();
+            }, 1000);
         }
     }
 });
@@ -647,6 +950,72 @@ document.addEventListener('click', function(e) {
             // Show modal
             const modal = new bootstrap.Modal(document.getElementById('customItemModal'));
             modal.show();
+        }
+    }
+});
+
+
+
+// Post-it editing functionality
+function editPostIt(postItElement) {
+    const contentElement = postItElement.querySelector('.post-it-content');
+    const editHint = postItElement.querySelector('.post-it-edit-hint');
+    
+    if (contentElement.contentEditable === 'false') {
+        // Start editing
+        contentElement.contentEditable = 'true';
+        contentElement.focus();
+        editHint.innerHTML = '<i class="fas fa-save"></i> Cliquez pour sauvegarder';
+        
+        // Select all text for easy editing
+        const range = document.createRange();
+        range.selectNodeContents(contentElement);
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+        
+        // Handle Enter key to save
+        contentElement.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                savePostIt(postItElement);
+            }
+        });
+        
+        // Handle click outside to save
+        document.addEventListener('click', function outsideClickHandler(e) {
+            if (!postItElement.contains(e.target)) {
+                savePostIt(postItElement);
+                document.removeEventListener('click', outsideClickHandler);
+            }
+        });
+    } else {
+        savePostIt(postItElement);
+    }
+}
+
+function savePostIt(postItElement) {
+    const contentElement = postItElement.querySelector('.post-it-content');
+    const editHint = postItElement.querySelector('.post-it-edit-hint');
+    
+    contentElement.contentEditable = 'false';
+    editHint.innerHTML = '<i class="fas fa-edit"></i> Cliquez pour modifier';
+    
+    // Save to localStorage - preserve HTML to maintain formatting
+    const content = contentElement.innerHTML;
+    localStorage.setItem('postItContent', content);
+    
+    // Remove focus
+    contentElement.blur();
+}
+
+// Load saved post-it content on page load
+document.addEventListener('DOMContentLoaded', function() {
+    const savedContent = localStorage.getItem('postItContent');
+    if (savedContent) {
+        const contentElement = document.querySelector('.post-it-content');
+        if (contentElement) {
+            contentElement.innerHTML = savedContent;
         }
     }
 });

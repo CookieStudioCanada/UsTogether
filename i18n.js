@@ -9,7 +9,7 @@ class I18n {
                 expenses: 'Dépenses',
                 calendar: 'Calendrier',
                 lists: 'Listes',
-                dataChat: 'Chat',
+
                 account: 'Compte',
                 
                 // Account Modal
@@ -39,11 +39,8 @@ class I18n {
                 goodMorning: 'Bonjour !',
                 dashboardSubtitle: 'Voici ce qui se passe avec vous et votre partenaire aujourd\'hui.',
                 loveNotes: 'Notes d\'amour',
-                todaysSchedule: 'Programme d\'aujourd\'hui',
-                recentActivity: 'Activité récente',
-                urgentTasks: 'Tâches urgentes',
+                upcomingEvents: 'Prochains événements',
                 viewFullCalendar: 'Voir le calendrier complet',
-                viewAllTasks: 'Voir toutes les tâches',
                 quickActions: 'Actions rapides',
                 addExpense: 'Ajouter une dépense',
                 addTask: 'Ajouter une tâche',
@@ -51,7 +48,7 @@ class I18n {
                 groceryList: 'Liste d\'épicerie',
                 
                 // Expenses
-                sharedExpenses: 'Dépenses partagées',
+                expensesTitle: 'Dépenses',
                 expensesSubtitle: 'Suivez et gérez vos dépenses communes.',
                 youAreOwedOverall: 'On vous doit au total',
                 youOwe: 'Vous devez',
@@ -97,6 +94,8 @@ class I18n {
                 calendarView: 'Vue du calendrier',
                 addNewEvent: 'Ajouter un nouvel événement',
                 eventName: 'Nom de l\'événement',
+                date: 'Date',
+                timeOptional: 'Heure (optionnelle)',
                 dateTime: 'Date et heure',
                 descriptionOptional: 'Description (optionnelle)',
                 participants: 'Participants',
@@ -107,20 +106,20 @@ class I18n {
                 
                 // Lists
                 sharedLists: 'Listes partagées',
-                listsSubtitle: 'Créez, assignez et suivez vos tâches ensemble.',
-                groceryListTab: 'Liste d\'épicerie',
-                todoLists: 'Liste de tâches',
-                customLists: 'Listes personnalisées',
+                listsSubtitle: 'Créez et gérez vos listes partagées.',
+                grocery: 'Épicerie',
+                groceryList: 'Liste d\'épicerie',
+                grocerySubtitle: 'Gérez votre liste de courses partagée.',
+                groceryCategories: 'Catégories',
+                groceryTips: 'Conseils',
+                autoDetect: 'Détection auto',
+
                 addGroceryItem: 'Ajouter un article d\'épicerie',
                 item: 'Article',
                 addItem: 'Ajouter l\'article',
                 shoppingList: 'Liste de courses',
                 exportList: 'Exporter la liste',
-                addNewTask: 'Ajouter une nouvelle tâche',
-                taskDescription: 'Description de la tâche',
-                dueDateOptional: 'Date d\'échéance (optionnelle)',
-                assignToOptional: 'Assigner à (optionnel)',
-                pendingTasks: 'Tâches en attente',
+
                 createNewList: 'Créer une nouvelle liste',
                 listName: 'Nom de la liste',
                 createList: 'Créer la liste',
@@ -128,10 +127,7 @@ class I18n {
                 addLink: 'Ajouter un lien',
                 addImage: 'Ajouter une image',
                 
-                // Data Chat
-                chatWithData: 'Discuter avec vos données',
-                chatSubtitle: 'Cette fonctionnalité sera bientôt disponible ! Vous pourrez poser des questions sur vos dépenses, tâches et événements.',
-                chatExample: 'Bientôt disponible : "Combien avons-nous dépensé en épicerie ce mois-ci ?" ou "Quelles tâches sont en retard ?"',
+
                 
                 // Common
                 today: 'Aujourd\'hui',
@@ -165,13 +161,15 @@ class I18n {
                 placeholderListName: 'ex: Plans de week-end, Idées cadeaux, Destinations de rêve',
                 additionalDetails: 'Détails supplémentaires...',
                 
-                // Tasks - Enhanced
-                taskTitle: 'Titre de la tâche',
-                priority: 'Priorité',
-                flag: 'Marqué',
-                noFlag: 'Non marqué',
-                addTask: 'Ajouter une tâche',
-                pendingTasks: 'Tâches en attente'
+                youOwe: "Vous devez",
+                partnerOwes: "Partenaire doit",
+                youAreOwedOverall: "On vous doit au total",
+                partnerIsOwedOverall: "On doit au partenaire",
+                allSquare: "Vous êtes à égalité !",
+                settleUp: "Régler",
+                email: "Courriel",
+                groupId: "ID du Groupe (Les Amoureux)",
+                logs: "Logs",
             },
             en: {
                 // Navigation
@@ -179,7 +177,7 @@ class I18n {
                 expenses: "Expenses",
                 calendar: "Calendar",
                 lists: "Lists",
-                dataChat: "Chat",
+
                 account: "Account",
                 
                 // Account Modal
@@ -209,11 +207,8 @@ class I18n {
                 goodMorning: 'Good Morning!',
                 dashboardSubtitle: 'Here\'s what\'s happening with you and your partner today.',
                 loveNotes: 'Love Notes',
-                todaysSchedule: 'Today\'s Schedule',
-                recentActivity: 'Recent Activity',
-                urgentTasks: 'Urgent Tasks',
+                upcomingEvents: 'Upcoming Events',
                 viewFullCalendar: 'View Full Calendar',
-                viewAllTasks: 'View All Tasks',
                 quickActions: 'Quick Actions',
                 addExpense: 'Add Expense',
                 addTask: 'Add Task',
@@ -221,8 +216,8 @@ class I18n {
                 groceryList: 'Grocery List',
                 
                 // Expenses
-                sharedExpenses: 'Shared Expenses',
-                expensesSubtitle: 'Track and manage your joint spending.',
+                expensesTitle: 'Expenses',
+                expensesSubtitle: 'Track and manage your shared expenses.',
                 youAreOwedOverall: 'You are owed overall',
                 youOwe: 'You owe',
                 youreOwed: 'You\'re owed',
@@ -267,6 +262,8 @@ class I18n {
                 calendarView: 'Calendar View',
                 addNewEvent: 'Add New Event',
                 eventName: 'Event Name',
+                date: 'Date',
+                timeOptional: 'Time (Optional)',
                 dateTime: 'Date & Time',
                 descriptionOptional: 'Description (Optional)',
                 participants: 'Participants',
@@ -277,20 +274,20 @@ class I18n {
                 
                 // Lists
                 sharedLists: 'Shared Lists',
-                listsSubtitle: 'Create, assign, and track your tasks together.',
-                groceryListTab: 'Grocery List',
-                todoLists: 'To-Do Lists',
-                customLists: 'Custom Lists',
+                listsSubtitle: 'Create and manage your shared lists.',
+                grocery: 'Grocery',
+                groceryList: 'Grocery List',
+                grocerySubtitle: 'Manage your shared shopping list.',
+                groceryCategories: 'Categories',
+                groceryTips: 'Tips',
+                autoDetect: 'Auto Detect',
+
                 addGroceryItem: 'Add Grocery Item',
                 item: 'Item',
                 addItem: 'Add Item',
                 shoppingList: 'Shopping List',
                 exportList: 'Export List',
-                addNewTask: 'Add New Task',
-                taskDescription: 'Task Description',
-                dueDateOptional: 'Due Date (Optional)',
-                assignToOptional: 'Assign To (Optional)',
-                pendingTasks: 'Pending Tasks',
+
                 createNewList: 'Create New List',
                 listName: 'List Name',
                 createList: 'Create List',
@@ -298,10 +295,7 @@ class I18n {
                 addLink: 'Add Link',
                 addImage: 'Add Image',
                 
-                // Data Chat
-                chatWithData: 'Chat with Your Data',
-                chatSubtitle: 'This feature will be available soon! You\'ll be able to ask questions about your expenses, tasks, and events.',
-                chatExample: 'Coming soon: "How much did we spend on groceries this month?" or "What tasks are overdue?"',
+
                 
                 // Common
                 today: 'Today',
@@ -335,13 +329,15 @@ class I18n {
                 placeholderListName: 'e.g., Weekend Plans, Gift Ideas, Dream Destinations',
                 additionalDetails: 'Additional details...',
                 
-                // Tasks - Enhanced
-                taskTitle: 'Task Title',
-                priority: 'Priority',
-                flag: 'Flag',
-                noFlag: 'No flag',
-                addTask: 'Add Task',
-                pendingTasks: 'Pending Tasks'
+                youOwe: "You Owe",
+                partnerOwes: "Partner Owes",
+                youAreOwedOverall: "You are owed overall",
+                partnerIsOwedOverall: "Partner is owed overall",
+                allSquare: "You are all square!",
+                settleUp: "Settle Up",
+                email: "Email",
+                groupId: "Group ID (The Lovers)",
+                logs: "Logs",
             }
         };
         
@@ -432,6 +428,46 @@ class I18n {
     toggleLanguage() {
         const newLang = this.currentLanguage === 'fr' ? 'en' : 'fr';
         this.setLanguage(newLang);
+    }
+
+    updateContent() {
+        document.querySelectorAll('[data-i18n]').forEach(element => {
+            const key = element.getAttribute('data-i18n');
+            element.innerText = this.translations[this.currentLanguage][key] || key;
+        });
+        document.documentElement.lang = this.currentLanguage;
+        this.updateLanguageSelector();
+    }
+
+    setLanguage(lang) {
+        if (lang === this.currentLanguage) return;
+        this.currentLanguage = lang;
+        localStorage.setItem('ustogether-language', lang);
+        this.updateContent();
+    }
+
+    toggleLanguage() {
+        this.setLanguage(this.currentLanguage === 'fr' ? 'en' : 'fr');
+    }
+
+    updateLanguageSelector() {
+        const lang = this.currentLanguage;
+        const frButton = document.getElementById('lang-fr');
+        const enButton = document.getElementById('lang-en');
+
+        if (frButton && enButton) {
+            if (lang === 'fr') {
+                frButton.classList.add('btn-red');
+                frButton.classList.remove('btn-outline-red');
+                enButton.classList.add('btn-outline-red');
+                enButton.classList.remove('btn-red');
+            } else {
+                enButton.classList.add('btn-red');
+                enButton.classList.remove('btn-outline-red');
+                frButton.classList.add('btn-outline-red');
+                frButton.classList.remove('btn-red');
+            }
+        }
     }
 }
 

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UsTogether - Votre Espace Partagé</title>
+    <title>UsTogether</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
@@ -32,15 +32,19 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="#" onclick="showView('expenses')">
-                    <i class="fas fa-receipt"></i>
-                    <span data-i18n="expenses">Dépenses</span>
+                <a class="nav-link" href="#" data-view="expenses" onclick="showView('expenses')">
+                    <i class="fas fa-receipt"></i> <span data-i18n="expenses">Dépenses</span>
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="#" onclick="showView('calendar')">
-                    <i class="fas fa-calendar"></i>
-                    <span data-i18n="calendar">Calendrier</span>
+                <a class="nav-link" href="#" data-view="calendar" onclick="showView('calendar')">
+                    <i class="fas fa-calendar-alt"></i> <span data-i18n="calendar">Calendrier</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" onclick="showView('grocery')">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span data-i18n="grocery">Épicerie</span>
                 </a>
             </li>
             <li class="nav-item">
@@ -49,14 +53,9 @@
                     <span data-i18n="lists">Listes</span>
                 </a>
             </li>
+
             <li class="nav-item">
-                <a class="nav-link" href="#" onclick="showView('data-chat')">
-                    <i class="fas fa-comments"></i>
-                    <span data-i18n="dataChat">Chat</span>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#" onclick="showView('account')">
+                <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#accountModal">
                     <i class="fas fa-user"></i>
                     <span data-i18n="account">Compte</span>
                 </a>
@@ -98,7 +97,50 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" data-i18n="cancel">Annuler</button>
-                    <button type="button" class="btn btn-purple" onclick="saveCustomItem()" data-i18n="saveItem">Sauvegarder l'élément</button>
+                    <button type="button" class="btn btn-red" onclick="saveCustomItem()" data-i18n="saveItem">Sauvegarder l'élément</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Account Modal -->
+    <div class="modal fade" id="accountModal" tabindex="-1" aria-labelledby="accountModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-gradient-red text-white">
+                    <h5 class="modal-title fw-bold" id="accountModalLabel" data-i18n="account">Compte</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center">
+                    <div class="mb-3">
+                        <i class="fas fa-user-circle profile-icon text-red-icon"></i>
+                        <h6 class="fw-bold mt-2 mb-0" data-i18n="email">Courriel</h6>
+                        <p class="form-control-plaintext py-0">peter@example.com</p>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold" data-i18n="groupId">ID du Groupe (Les Amoureux)</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" value="AB123-CD456" readonly>
+                            <button class="btn btn-outline-secondary" type="button" onclick="alert('Fonctionnalité pas encore implémentée.')"><i class="fas fa-copy"></i></button>
+                        </div>
+                    </div>
+
+                    <div class="mt-2">
+                        <label class="form-label fw-bold d-block mb-2" data-i18n="language">Langue</label>
+                        <div class="d-flex justify-content-center gap-2">
+                            <button type="button" class="btn btn-red rounded-pill px-4" id="lang-fr" onclick="i18n.setLanguage('fr')">Français</button>
+                            <button type="button" class="btn btn-outline-red rounded-pill px-4" id="lang-en" onclick="i18n.setLanguage('en')">English</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light flex-column align-items-stretch pt-2 pb-3">
+                    <button type="button" class="btn btn-red w-100" data-i18n="saveChanges">
+                        <i class="fas fa-save me-2"></i>Sauvegarder
+                    </button>
+                    <div class="text-center mt-2">
+                        <a href="#" class="text-muted small" data-i18n="logs" onclick="alert('Fonctionnalité pas encore implémentée.')">Logs</a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -115,65 +157,44 @@
                 </div>
             </div>
 
-            <!-- Love Notes Section -->
-            <div class="love-notes-container">
-                <div class="row">
-                    <div class="col-md-6 col-lg-3 mb-3">
-                        <div class="post-it">
-                            <div class="post-it-content">
-                                N'oublie pas que tu es fantastique ! J'ai hâte de te voir ce soir 😘
-                            </div>
+            <!-- Main Content Row -->
+            <div class="row">
+                <!-- Love Notes Section -->
+                <div class="col-lg-5 mb-4">
+                    <div class="love-notes-container">
+                        <div class="post-it editable-post-it" onclick="editPostIt(this)">
+                            <div class="post-it-content" contenteditable="false">N'oublie pas que tu es fantastique ! J'ai hâte de te voir ce soir 😘</div>
                             <div class="post-it-author">- Ton Amour ❤️</div>
-                        </div>
-                    </div>
-                    <div class="col-md-6 col-lg-3 mb-3">
-                        <div class="post-it">
-                            <div class="post-it-content">
-                                J'ai préparé ton café préféré ce matin ! Il est dans le thermos ☕
+                            <div class="post-it-edit-hint">
+                                <i class="fas fa-edit"></i> Cliquez pour modifier
                             </div>
-                            <div class="post-it-author">- Moi 💙</div>
-                        </div>
-                    </div>
-                    <div class="col-md-6 col-lg-3 mb-3">
-                        <div class="post-it">
-                            <div class="post-it-content">
-                                Merci d'avoir fait la vaisselle hier. Tu es le/la meilleur(e) ! 🌟
-                            </div>
-                            <div class="post-it-author">- Bébé 💖</div>
-                        </div>
-                    </div>
-                    <div class="col-md-6 col-lg-3 mb-3">
-                        <div class="post-it">
-                            <div class="post-it-content">
-                                Soirée cinéma ce soir ? J'ai préparé le popcorn ! 🍿
-                            </div>
-                            <div class="post-it-author">- Ton/Ta Partenaire 💚</div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Main Content Row -->
-            <div class="row">
-                <!-- Today's Schedule -->
-                <div class="col-lg-4 mb-4">
+                <!-- Upcoming Events -->
+                <div class="col-lg-7 mb-4">
                     <div class="card h-100">
                         <div class="card-header">
-                            <span data-i18n="todaysSchedule">Programme d'aujourd'hui</span>
-                            <i class="fas fa-clock"></i>
+                            <span data-i18n="upcomingEvents">Prochains événements</span>
+                            <i class="fas fa-calendar-alt"></i>
                         </div>
                         <div class="card-body">
                             <div class="mini-event">
-                                <strong>Entraînement matinal</strong>
-                                <br><small>7h00 - Les deux</small>
-                            </div>
-                            <div class="mini-event">
-                                <strong>Courses épicerie</strong>
-                                <br><small>15h00 - Vous</small>
-                            </div>
-                            <div class="mini-event">
                                 <strong>Soirée cinéma</strong>
-                                <br><small>20h00 - Les deux</small>
+                                <br><small>Demain 20h00 - Les deux</small>
+                            </div>
+                            <div class="mini-event">
+                                <strong>Dîner d'anniversaire</strong>
+                                <br><small>Samedi 19h30 - Les deux</small>
+                            </div>
+                            <div class="mini-event">
+                                <strong>Cours de yoga ensemble</strong>
+                                <br><small>Lundi 10h00 - Les deux</small>
+                            </div>
+                            <div class="mini-event">
+                                <strong>Week-end romantique</strong>
+                                <br><small>Dans 12 jours - Les deux</small>
                             </div>
                             <button class="btn btn-outline-primary btn-sm mt-2" onclick="showView('calendar')" data-i18n="viewFullCalendar">
                                 Voir le calendrier complet
@@ -181,96 +202,34 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Recent Activity -->
-                <div class="col-lg-4 mb-4">
-                    <div class="card h-100">
-                        <div class="card-header">
-                            <span data-i18n="recentActivity">Activité récente</span>
-                            <i class="fas fa-bell"></i>
-                        </div>
-                        <div class="card-body">
-                            <div class="recent-activity">
-                                <div class="activity-item">
-                                    <strong>Partenaire</strong> a ajouté "Dîner romantique" au calendrier
-                                    <div class="activity-time">il y a 2 heures</div>
-                                </div>
-                                <div class="activity-item">
-                                    <strong>Vous</strong> avez terminé "Acheter l'épicerie"
-                                    <div class="activity-time">il y a 4 heures</div>
-                                </div>
-                                <div class="activity-item">
-                                    <strong>Partenaire</strong> a payé 45,50 $ pour "Restaurant"
-                                    <div class="activity-time">Hier</div>
-                                </div>
-                                <div class="activity-item">
-                                    <strong>Vous</strong> avez ajouté "Voyage de week-end" à la liste de souhaits
-                                    <div class="activity-time">il y a 2 jours</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Urgent Tasks -->
-                <div class="col-lg-4 mb-4">
-                    <div class="card h-100">
-                        <div class="card-header">
-                            <span data-i18n="urgentTasks">Tâches urgentes</span>
-                            <i class="fas fa-exclamation-triangle"></i>
-                        </div>
-                        <div class="card-body">
-                            <div class="task-item">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div class="flex-grow-1">
-                                        <strong>Payer la facture d'électricité</strong>
-                                        <br><small>Échéance demain</small>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="task-item">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div class="flex-grow-1">
-                                        <strong>Réserver le restaurant d'anniversaire</strong>
-                                        <br><small>Échéance dans 2 jours</small>
-                                    </div>
-                                </div>
-                            </div>
-                            <button class="btn btn-outline-primary btn-sm mt-2" onclick="showView('lists')" data-i18n="viewAllTasks">
-                                Voir toutes les tâches
-                            </button>
-                        </div>
-                    </div>
-                </div>
             </div>
 
-            <!-- Quick Actions -->
-            <div class="mt-4">
-                <h3 class="mb-4" data-i18n="quickActions">Actions rapides</h3>
-                <div class="row">
-                    <div class="col-md-3 col-6 mb-3">
-                        <button class="quick-action-btn" onclick="showAddExpenseForm()">
-                            <i class="fas fa-plus-circle"></i>
-                            <span data-i18n="addExpense">Ajouter une dépense</span>
-                        </button>
+            <!-- Love Notes Section -->
+            <div class="mt-4 d-none d-md-block">
+                <div class="row row-cols-2 row-cols-md-4 g-3">
+                    <div class="col">
+                        <a href="#" class="btn btn-red w-100 h-100 d-flex flex-column align-items-center justify-content-center p-3" onclick="event.preventDefault(); showAddExpenseForm()" style="min-height: 110px;">
+                            <i class="fas fa-credit-card fs-4 mb-2"></i>
+                            <span class="small text-center" data-i18n="addExpense">Ajouter une dépense</span>
+                        </a>
                     </div>
-                    <div class="col-md-3 col-6 mb-3">
-                        <button class="quick-action-btn" onclick="showAddTaskForm()">
-                            <i class="fas fa-plus-circle"></i>
-                            <span data-i18n="addTask">Ajouter une tâche</span>
-                        </button>
+                    <div class="col">
+                        <a href="#" class="btn btn-red w-100 h-100 d-flex flex-column align-items-center justify-content-center p-3" onclick="event.preventDefault(); showAddTaskForm()" style="min-height: 110px;">
+                            <i class="fas fa-tasks fs-4 mb-2"></i>
+                            <span class="small text-center" data-i18n="addTask">Ajouter une tâche</span>
+                        </a>
                     </div>
-                    <div class="col-md-3 col-6 mb-3">
-                        <button class="quick-action-btn" onclick="showAddEventForm()">
-                            <i class="fas fa-plus-circle"></i>
-                            <span data-i18n="addEvent">Ajouter un événement</span>
-                        </button>
+                    <div class="col">
+                        <a href="#" class="btn btn-red w-100 h-100 d-flex flex-column align-items-center justify-content-center p-3" onclick="event.preventDefault(); showAddEventForm()" style="min-height: 110px;">
+                            <i class="fas fa-calendar-plus fs-4 mb-2"></i>
+                            <span class="small text-center" data-i18n="addEvent">Ajouter un événement</span>
+                        </a>
                     </div>
-                    <div class="col-md-3 col-6 mb-3">
-                        <button class="quick-action-btn" onclick="showGroceryList()">
-                            <i class="fas fa-shopping-cart"></i>
-                            <span data-i18n="groceryList">Liste d'épicerie</span>
-                        </button>
+                    <div class="col">
+                        <a href="#" class="btn btn-red w-100 h-100 d-flex flex-column align-items-center justify-content-center p-3" onclick="event.preventDefault(); showGroceryList()" style="min-height: 110px;">
+                            <i class="fas fa-shopping-basket fs-4 mb-2"></i>
+                            <span class="small text-center" data-i18n="groceryList">Liste d'épicerie</span>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -278,27 +237,20 @@
 
         <!-- Expenses View -->
         <div id="expenses" class="view-section">
-            <h1 class="mb-4" data-i18n="sharedExpenses">Dépenses partagées</h1>
+            <h1><i class="fas fa-receipt me-3 text-red-icon"></i><span data-i18n="expensesTitle">Dépenses</span></h1>
             <p class="text-muted mb-4" data-i18n="expensesSubtitle">Suivez et gérez vos dépenses communes.</p>
             
             <!-- Balance Summary at Top -->
             <div class="balance-summary">
                 <div class="row">
-                    <div class="col-md-4 text-center">
+                    <div class="col-12 text-center mb-4">
                         <div class="balance-amount">+$28.75</div>
                         <div data-i18n="youAreOwedOverall">On vous doit au total</div>
-                    </div>
-                    <div class="col-md-4 text-center">
-                        <div style="font-size: 1.5rem; margin-bottom: 10px;"><span data-i18n="youOwe">Vous devez</span> : <strong>$156.25</strong></div>
-                        <button class="settle-btn" onclick="settleUp('owe')">
-                            <i class="fas fa-exchange-alt me-1"></i><span data-i18n="settleUp">Régler</span>
-                        </button>
-                    </div>
-                    <div class="col-md-4 text-center">
-                        <div style="font-size: 1.5rem; margin-bottom: 10px;"><span data-i18n="youreOwed">On vous doit</span> : <strong>$185.00</strong></div>
-                        <button class="settle-btn" onclick="settleUp('owed')">
-                            <i class="fas fa-request"></i><span data-i18n="requestPayment">Demander le paiement</span>
-                        </button>
+                        <div class="mt-3">
+                            <button class="settle-btn me-2" onclick="settleUp('owe')">
+                                <i class="fas fa-exchange-alt me-1"></i><span data-i18n="settleUp">Régler</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -309,31 +261,31 @@
                 <p class="text-muted mb-4" data-i18n="expenseDetails">Entrez les détails d'une dépense partagée.</p>
                 <form id="expense-form">
                     <div class="row">
-                        <div class="col-12 mb-3">
+                        <div class="col-md-8 mb-3">
                             <label class="form-label" data-i18n="description">Description</label>
                             <input type="text" class="form-control" id="expense-description" data-i18n-placeholder="placeholderDescription" placeholder="ex: Épicerie" required>
                         </div>
-                        <div class="col-md-3 mb-3">
+                        <div class="col-md-4 mb-3">
                             <label class="form-label"><span data-i18n="amount">Montant</span> ($)</label>
                             <input type="number" class="form-control" id="expense-amount" data-i18n-placeholder="placeholderAmount" placeholder="ex: 50.00" step="0.01" required>
                         </div>
                         <div class="col-md-3 mb-3">
                             <label class="form-label" data-i18n="category">Catégorie</label>
-                            <select class="form-select" id="expense-category" required>
+                            <select class="form-select" id="expense-category">
                                 <option value="" data-i18n="selectCategory">Sélectionner une catégorie</option>
-                                <option value="food" data-i18n="foodDining">🍕 Alimentation</option>
-                                <option value="transport" data-i18n="transport">🚗 Transport</option>
-                                <option value="entertainment" data-i18n="entertainment">🎬 Divertissement</option>
-                                <option value="utilities" data-i18n="utilities">💡 Services publics</option>
-                                <option value="shopping" data-i18n="shopping">🛍️ Shopping</option>
-                                <option value="other" data-i18n="other">📦 Autre</option>
+                                <option value="epicerie">🛒 Épicerie</option>
+                                <option value="pret-maison">🏠 Prêt maison</option>
+                                <option value="restaurants">🍽️ Restaurants</option>
+                                <option value="transport">🚗 Transport</option>
+                                <option value="divertissement">🎬 Divertissement</option>
+                                <option value="depenses-maison">🏡 Dépenses maison</option>
+                                <option value="autre">📦 Autre</option>
                             </select>
                         </div>
                         <div class="col-md-3 mb-3">
                             <label class="form-label" data-i18n="paidBy">Payé par</label>
                             <select class="form-select" id="expense-payer" required>
-                                <option value="" data-i18n="selectUser">Sélectionner un utilisateur</option>
-                                <option value="you" data-i18n="you">Vous</option>
+                                <option value="you" data-i18n="you" selected>Vous</option>
                                 <option value="partner" data-i18n="partner">Partenaire</option>
                             </select>
                         </div>
@@ -352,8 +304,8 @@
                                 <option value="yearly" data-i18n="yearly">Chaque année</option>
                             </select>
                         </div>
-                        <div class="col-12">
-                            <button type="submit" class="btn btn-purple">
+                        <div class="col-12 text-center">
+                            <button type="submit" class="btn btn-red">
                                 <i class="fas fa-plus-circle me-2"></i><span data-i18n="addExpense">Ajouter une dépense</span>
                             </button>
                         </div>
@@ -372,35 +324,36 @@
                                 </button>
                                 <select class="form-select d-inline-block w-auto" id="category-filter" onchange="filterByCategory()">
                                     <option value="" data-i18n="allCategories">Toutes les catégories</option>
-                                    <option value="food">Alimentation</option>
+                                    <option value="epicerie">Épicerie</option>
+                                    <option value="pret-maison">Prêt maison</option>
+                                    <option value="restaurants">Restaurants</option>
                                     <option value="transport">Transport</option>
-                                    <option value="entertainment">Divertissement</option>
-                                    <option value="utilities">Services publics</option>
-                                    <option value="shopping">Shopping</option>
-                                    <option value="other">Autre</option>
+                                    <option value="divertissement">Divertissement</option>
+                                    <option value="depenses-maison">Dépenses maison</option>
+                                    <option value="autre">Autre</option>
                                 </select>
                             </div>
                         </div>
                         <div class="card-body">
                             <div id="expenses-list">
-                                <div class="expense-item" data-category="food">
+                                <div class="expense-item" data-category="epicerie">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div>
-                                            <span class="category-badge category-food">🍕 Alimentation</span>
-                                            <strong>Courses épicerie</strong>
+                                            <strong>Costco</strong>
+                                            <span class="category-badge category-epicerie">🛒 Épicerie</span>
                                             <br><small>Payé par Vous • Partagé équitablement • 15/01/2024</small>
                                         </div>
                                         <div class="text-end">
-                                            <div class="fw-bold">$85.50</div>
-                                            <small class="text-muted">Vous devez : $42.75</small>
+                                            <div class="fw-bold">$185.50</div>
+                                            <small class="text-muted">Vous devez : $92.75</small>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="expense-item" data-category="entertainment">
+                                <div class="expense-item" data-category="divertissement">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div>
-                                            <span class="category-badge category-entertainment">🎬 Divertissement</span>
                                             <strong>Billets de cinéma</strong>
+                                            <span class="category-badge category-divertissement">🎬 Divertissement</span>
                                             <br><small>Payé par Partenaire • Partagé équitablement • 14/01/2024</small>
                                         </div>
                                         <div class="text-end">
@@ -412,8 +365,8 @@
                                 <div class="expense-item" data-category="transport">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div>
-                                            <span class="category-badge category-transport">🚗 Transport</span>
                                             <strong>Uber vers l'aéroport</strong>
+                                            <span class="category-badge category-transport">🚗 Transport</span>
                                             <br><small>Payé par Vous • Partagé équitablement • 12/01/2024</small>
                                         </div>
                                         <div class="text-end">
@@ -422,11 +375,11 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="expense-item" data-category="utilities">
+                                <div class="expense-item" data-category="depenses-maison">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div>
-                                            <span class="category-badge category-utilities">💡 Services publics</span>
                                             <strong>Facture d'électricité</strong>
+                                            <span class="category-badge category-depenses-maison">🏡 Dépenses maison</span>
                                             <br><small>Payé par Partenaire • Partagé équitablement • 10/01/2024</small>
                                         </div>
                                         <div class="text-end">
@@ -435,29 +388,16 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="expense-item" data-category="food">
+                                <div class="expense-item" data-category="restaurants">
                                     <div class="d-flex justify-content-between align-items-center">
                                         <div>
-                                            <span class="category-badge category-food">🍕 Alimentation</span>
                                             <strong>Restaurant italien</strong>
+                                            <span class="category-badge category-restaurants">🍽️ Restaurants</span>
                                             <br><small>Payé par Vous • Partagé équitablement • 08/01/2024</small>
                                         </div>
                                         <div class="text-end">
                                             <div class="fw-bold">$67.80</div>
                                             <small class="text-muted">Vous devez : $33.90</small>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="expense-item" data-category="shopping">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <span class="category-badge category-shopping">🛍️ Shopping</span>
-                                            <strong>Vêtements d'hiver</strong>
-                                            <br><small>Payé par Partenaire • Partagé équitablement • 06/01/2024</small>
-                                        </div>
-                                        <div class="text-end">
-                                            <div class="fw-bold">$156.00</div>
-                                            <small class="text-success">Partenaire doit : $78.00</small>
                                         </div>
                                     </div>
                                 </div>
@@ -473,13 +413,19 @@
                         <div class="card-body">
                             <div class="mb-3">
                                 <div class="d-flex justify-content-between">
-                                    <span class="category-badge category-food">🍕 Alimentation</span>
-                                    <strong>$153.30</strong>
+                                    <span class="category-badge category-epicerie">🛒 Épicerie</span>
+                                    <strong>$118.50</strong>
                                 </div>
                             </div>
                             <div class="mb-3">
                                 <div class="d-flex justify-content-between">
-                                    <span class="category-badge category-entertainment">🎬 Divertissement</span>
+                                    <span class="category-badge category-restaurants">🍽️ Restaurants</span>
+                                    <strong>$67.80</strong>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between">
+                                    <span class="category-badge category-divertissement">🎬 Divertissement</span>
                                     <strong>$28.00</strong>
                                 </div>
                             </div>
@@ -491,14 +437,8 @@
                             </div>
                             <div class="mb-3">
                                 <div class="d-flex justify-content-between">
-                                    <span class="category-badge category-utilities">💡 Services publics</span>
+                                    <span class="category-badge category-depenses-maison">🏡 Dépenses maison</span>
                                     <strong>$120.00</strong>
-                                </div>
-                            </div>
-                            <div class="mb-3">
-                                <div class="d-flex justify-content-between">
-                                    <span class="category-badge category-shopping">🛍️ Shopping</span>
-                                    <strong>$156.00</strong>
                                 </div>
                             </div>
                         </div>
@@ -509,8 +449,8 @@
 
         <!-- Calendar View -->
         <div id="calendar" class="view-section">
-            <h1 class="mb-4" data-i18n="sharedCalendar">Calendrier partagé</h1>
-            <p class="text-muted mb-4" data-i18n="calendarSubtitle">Consultez et gérez vos événements ensemble.</p>
+            <h1><i class="fas fa-calendar-alt me-3 text-red-icon"></i><span data-i18n="calendar">Calendrier</span></h1>
+            <p class="text-muted mb-4" data-i18n="calendarSubtitle">Planifiez et visualisez vos événements communs.</p>
 
             <div class="row">
                 <div class="col-lg-8 mb-4">
@@ -520,7 +460,7 @@
                             <button class="calendar-nav" onclick="changeMonth(-1)">
                                 <i class="fas fa-chevron-left"></i>
                             </button>
-                            <div class="calendar-title" id="calendar-title">Juin 2025</div>
+                            <div class="calendar-title" id="calendar-title">Calendrier</div>
                             <button class="calendar-nav" onclick="changeMonth(1)">
                                 <i class="fas fa-chevron-right"></i>
                             </button>
@@ -535,28 +475,24 @@
                         <h4 class="mb-3" data-i18n="addNewEvent">Ajouter un nouvel événement</h4>
                         <form id="event-form">
                             <div class="row">
-                                <div class="col-md-6 mb-3">
+                                <div class="col-md-4 mb-3">
                                     <label class="form-label" data-i18n="eventName">Nom de l'événement</label>
                                     <input type="text" class="form-control" id="event-name" data-i18n-placeholder="placeholderEvent" placeholder="ex: Dîner romantique" required>
                                 </div>
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label" data-i18n="dateTime">Date et heure</label>
-                                    <input type="datetime-local" class="form-control" id="event-datetime" required>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label" data-i18n="date">Date</label>
+                                    <input type="date" class="form-control" id="event-date" required>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label" data-i18n="timeOptional">Heure (optionnelle)</label>
+                                    <input type="time" class="form-control" id="event-time">
                                 </div>
                                 <div class="col-12 mb-3">
                                     <label class="form-label" data-i18n="descriptionOptional">Description (optionnelle)</label>
                                     <textarea class="form-control" id="event-description" rows="2" data-i18n-placeholder="additionalDetails" placeholder="Détails supplémentaires..."></textarea>
                                 </div>
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label" data-i18n="participants">Participants</label>
-                                    <select class="form-select" id="event-participants">
-                                        <option value="both" data-i18n="both">Les deux</option>
-                                        <option value="you" data-i18n="youOnly">Vous seulement</option>
-                                        <option value="partner" data-i18n="partnerOnly">Partenaire seulement</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <button type="submit" class="btn btn-purple mt-4">
+                                <div class="col-12 mb-3 text-center">
+                                    <button type="submit" class="btn btn-red">
                                         <i class="fas fa-plus-circle me-2"></i><span data-i18n="addEvent">Ajouter un événement</span>
                                     </button>
                                 </div>
@@ -571,61 +507,7 @@
                         </div>
                         <div class="card-body">
                             <div id="events-list">
-                                <div class="event-item">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <strong>Soirée cinéma</strong>
-                                            <br><small><i class="fas fa-clock"></i> Ce soir, 20h00</small>
-                                        </div>
-                                        <div>
-                                            <span class="badge bg-primary" data-i18n="tonight">Ce soir</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="event-item">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <strong>Dîner d'anniversaire</strong>
-                                            <br><small><i class="fas fa-clock"></i> Demain, 19h30</small>
-                                        </div>
-                                        <div>
-                                            <span class="badge bg-success" data-i18n="tomorrow">Demain</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="event-item">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <strong>Cours de yoga ensemble</strong>
-                                            <br><small><i class="fas fa-clock"></i> Samedi, 10h00</small>
-                                        </div>
-                                        <div>
-                                            <span class="badge bg-info" data-i18n="thisWeek">Cette semaine</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="event-item">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <strong>Week-end romantique</strong>
-                                            <br><small><i class="fas fa-clock"></i> 25-26 Janvier</small>
-                                        </div>
-                                        <div>
-                                            <span class="badge bg-warning" data-i18n="nextWeek">Bientôt</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="event-item">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <strong>Visite chez les parents</strong>
-                                            <br><small><i class="fas fa-clock"></i> Dimanche, 14h00</small>
-                                        </div>
-                                        <div>
-                                            <span class="badge bg-secondary" data-i18n="thisWeek">Cette semaine</span>
-                                        </div>
-                                    </div>
-                                </div>
+                                <!-- Les événements réels seront ajoutés ici par JavaScript -->
                             </div>
                         </div>
                     </div>
@@ -633,258 +515,152 @@
             </div>
         </div>
 
-        <!-- Lists View -->
-        <div id="lists" class="view-section">
-            <h1 class="mb-4" data-i18n="sharedLists">Listes partagées</h1>
-            <p class="text-muted mb-4" data-i18n="listsSubtitle">Créez, assignez et suivez vos tâches ensemble.</p>
+        <!-- Grocery View -->
+        <div id="grocery" class="view-section">
+            <h1 class="mb-4"><i class="fas fa-shopping-cart me-3"></i><span data-i18n="groceryList">Liste d'épicerie</span></h1>
+            <p class="text-muted mb-4" data-i18n="grocerySubtitle">Gérez votre liste de courses partagée.</p>
 
-            <!-- List Navigation Tabs -->
-            <div class="list-tabs">
-                <button class="list-tab active" onclick="showListTab('grocery')" data-i18n="groceryListTab">Liste d'épicerie</button>
-                <button class="list-tab" onclick="showListTab('todos')" data-i18n="todoLists">Liste de tâches</button>
-                <button class="list-tab" onclick="showListTab('custom')" data-i18n="customLists">Listes personnalisées</button>
+            <div class="grocery-header">
+                <div class="grocery-header-content">
+                    <h2><i class="fas fa-list me-2"></i><span data-i18n="shoppingList">Liste de courses</span></h2>
+                    <div class="grocery-filter d-none d-md-block">
+                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-filter me-1"></i>Toutes
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#" onclick="filterGroceryByCategory('all')">Toutes</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="filterGroceryByCategory('fruits-legumes')">Fruits/Légumes</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="filterGroceryByCategory('boulangerie')">Boulangerie</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="filterGroceryByCategory('viandes')">Viandes</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="filterGroceryByCategory('congeles')">Congelés</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="filterGroceryByCategory('laitiers')">Laitiers</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="filterGroceryByCategory('epicerie')">Épicerie</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="filterGroceryByCategory('autre')">Autre</a></li>
+                        </ul>
+                    </div>
+                </div>
             </div>
 
-            <!-- Grocery List Tab -->
-            <div id="grocery-tab" class="tab-content active">
-                <div class="add-form">
-                    <h3 data-i18n="addGroceryItem">Ajouter un article d'épicerie</h3>
-                    <form id="grocery-form">
-                        <div class="row">
-                            <div class="col-md-8 mb-3">
-                                <label class="form-label" data-i18n="item">Article</label>
-                                <input type="text" class="form-control" id="grocery-item" data-i18n-placeholder="placeholderGrocery" placeholder="ex: Lait, Pain, Poitrine de poulet - 2 lbs" required>
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <button type="submit" class="btn btn-purple mt-4">
-                                    <i class="fas fa-plus-circle me-2"></i><span data-i18n="addItem">Ajouter l'article</span>
-                                </button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
+            <div class="grocery-content">
+                <form id="grocery-form" class="grocery-form">
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="item">Article</label>
+                        <input type="text" class="form-control" id="grocery-item" placeholder="ex: Lait, Pain..." required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" data-i18n="category">Catégorie</label>
+                        <select class="form-select" id="grocery-category">
+                            <option value="" data-i18n="autoDetect">Détection auto</option>
+                            <option value="fruits-legumes">Fruits/Légumes</option>
+                            <option value="boulangerie">Boulangerie</option>
+                            <option value="viandes">Viandes</option>
+                            <option value="congeles">Congelés</option>
+                            <option value="laitiers">Laitiers</option>
+                            <option value="epicerie">Épicerie</option>
+                            <option value="autre">Autre</option>
+                        </select>
+                    </div>
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-red">
+                            <i class="fas fa-plus me-2"></i><span data-i18n="addItem">Ajouter l'article</span>
+                        </button>
+                    </div>
+                </form>
 
-                <div class="card">
-                    <div class="card-header">
-                        <span data-i18n="shoppingList">Liste de courses</span>
-                        <div>
-                            <button class="export-btn" onclick="exportGroceryList()">
-                                <i class="fas fa-list me-1"></i><span data-i18n="exportList">Exporter la liste</span>
+                <div id="grocery-list">
+                    <!-- Items will be grouped by category -->
+                </div>
+            </div>
+
+            <!-- Export button (at bottom) -->
+            <div class="grocery-export mt-4">
+                <button class="btn btn-red w-100" onclick="exportGroceryList()">
+                    <i class="fas fa-download me-2"></i><span data-i18n="exportList">Exporter la liste</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Lists View -->
+        <div id="lists" class="view-section">
+            <h1 class="mb-4"><i class="fas fa-list me-3"></i><span data-i18n="lists">Listes</span></h1>
+            <p class="text-muted mb-4" data-i18n="listsSubtitle">Créez et gérez vos listes partagées.</p>
+
+            <div class="add-form">
+                <h3 data-i18n="createNewList">Créer une nouvelle liste</h3>
+                <form id="custom-list-form">
+                    <div class="row">
+                        <div class="col-md-8 mb-3">
+                            <label class="form-label" data-i18n="listName">Nom de la liste</label>
+                            <input type="text" class="form-control" id="custom-list-name" data-i18n-placeholder="placeholderListName" placeholder="ex: Plans de week-end, Idées cadeaux, Destinations de rêve" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <button type="submit" class="btn btn-red mt-4">
+                                <i class="fas fa-plus-circle me-2"></i><span data-i18n="createList">Créer la liste</span>
                             </button>
                         </div>
                     </div>
-                    <div class="card-body">
-                        <div id="grocery-list">
-                            <div class="grocery-item">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="grocery1">
-                                    <label class="form-check-label" for="grocery1">
-                                        <strong>Lait bio - 1 litre</strong>
-                                    </label>
-                                </div>
-                                <div>
-                                    <button class="btn btn-sm btn-outline-danger" onclick="removeGroceryItem(this)">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="grocery-item">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="grocery2">
-                                    <label class="form-check-label" for="grocery2">
-                                        <strong>Pain complet</strong>
-                                    </label>
-                                </div>
-                                <div>
-                                    <button class="btn btn-sm btn-outline-danger" onclick="removeGroceryItem(this)">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="grocery-item">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="grocery3">
-                                    <label class="form-check-label" for="grocery3">
-                                        <strong>Pommes de terre - 2 kg</strong>
-                                    </label>
-                                </div>
-                                <div>
-                                    <button class="btn btn-sm btn-outline-danger" onclick="removeGroceryItem(this)">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="grocery-item">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="grocery4">
-                                    <label class="form-check-label" for="grocery4">
-                                        <strong>Saumon frais - 400g</strong>
-                                    </label>
-                                </div>
-                                <div>
-                                    <button class="btn btn-sm btn-outline-danger" onclick="removeGroceryItem(this)">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="grocery-item completed">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="grocery5" checked>
-                                    <label class="form-check-label" for="grocery5">
-                                        <strong>Œufs - 12 unités</strong>
-                                    </label>
-                                </div>
-                                <div>
-                                    <button class="btn btn-sm btn-outline-danger" onclick="removeGroceryItem(this)">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="grocery-item">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="grocery6">
-                                    <label class="form-check-label" for="grocery6">
-                                        <strong>Fromage de chèvre</strong>
-                                    </label>
-                                </div>
-                                <div>
-                                    <button class="btn btn-sm btn-outline-danger" onclick="removeGroceryItem(this)">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                </form>
             </div>
 
-            <!-- To-Do Lists Tab -->
-            <div id="todos-tab" class="tab-content">
-                <div class="add-form">
-                    <h3 data-i18n="addNewTask">Ajouter une nouvelle tâche</h3>
-                    <form id="task-form">
-                        <div class="row">
-                            <div class="col-12 mb-3">
-                                <label class="form-label" data-i18n="taskTitle">Titre de la tâche</label>
-                                <input type="text" class="form-control" id="task-title" data-i18n-placeholder="placeholderTaskTitle" placeholder="ex: Faire les courses" required>
-                            </div>
-                            <div class="col-12 mb-3">
-                                <label class="form-label" data-i18n="taskDescription">Description de la tâche</label>
-                                <textarea class="form-control" id="task-description" rows="3" data-i18n-placeholder="placeholderTask" placeholder="ex: Acheter les ingrédients pour le dîner de ce soir"></textarea>
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="form-label" data-i18n="dueDateOptional">Date d'échéance (optionnelle)</label>
-                                <input type="date" class="form-control" id="task-date">
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <button type="submit" class="btn btn-purple mt-4">
-                                    <i class="fas fa-plus-circle me-2"></i><span data-i18n="addTask">Ajouter une tâche</span>
+            <div class="row" id="custom-lists-container">
+                <!-- Todo List -->
+                <div class="col-lg-6 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <span>✅ Tâches</span>
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-outline-light" data-bs-toggle="dropdown">
+                                    <i class="fas fa-plus"></i>
                                 </button>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="#" onclick="addCustomItem('todos', 'text')"><i class="fas fa-text-width me-2"></i><span data-i18n="addText">Ajouter du texte</span></a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="addCustomItem('todos', 'link')"><i class="fas fa-link me-2"></i><span data-i18n="addLink">Ajouter un lien</span></a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="addCustomItem('todos', 'image')"><i class="fas fa-image me-2"></i><span data-i18n="addImage">Ajouter une image</span></a></li>
+                                </ul>
                             </div>
                         </div>
-                    </form>
-                </div>
-
-                <div class="card">
-                    <div class="card-header">
-                        <span data-i18n="pendingTasks">Tâches en attente</span>
-                    </div>
-                    <div class="card-body">
-                        <div id="todos-list">
-                            <div class="task-item">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div class="flex-grow-1">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" id="task1">
-                                            <label class="form-check-label" for="task1">
-                                                <strong>Faire les courses</strong>
-                                                <br><small>Acheter les ingrédients pour le dîner</small>
-                                            </label>
-                                        </div>
+                        <div class="card-body">
+                            <div id="todos-list" class="custom-list">
+                                <div class="custom-item">
+                                    <div class="custom-item-content">
+                                        <strong>Faire les courses</strong>
+                                        <br><small class="text-muted">Acheter les ingrédients pour le dîner</small>
                                     </div>
+                                    <button class="btn btn-sm btn-outline-danger" onclick="removeCustomItem(this)">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
                                 </div>
-                            </div>
-                            <div class="task-item">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div class="flex-grow-1">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" id="task2">
-                                            <label class="form-check-label" for="task2">
-                                                <strong>Réserver le restaurant</strong>
-                                                <br><small>Pour l'anniversaire de samedi</small>
-                                                <br><small class="text-muted">Ajouté il y a 2 heures • Échéance : 20/01/2024</small>
-                                            </label>
-                                        </div>
+                                <div class="custom-item">
+                                    <div class="custom-item-content">
+                                        <strong>Réserver le restaurant</strong>
+                                        <br><small class="text-muted">Pour l'anniversaire de samedi</small>
                                     </div>
+                                    <button class="btn btn-sm btn-outline-danger" onclick="removeCustomItem(this)">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
                                 </div>
-                            </div>
-                            <div class="task-item">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div class="flex-grow-1">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" id="task3">
-                                            <label class="form-check-label" for="task3">
-                                                <strong>Nettoyer l'appartement</strong>
-                                                <br><small>Aspirateur et ménage général</small>
-                                                <br><small class="text-muted">Ajouté hier</small>
-                                            </label>
-                                        </div>
+                                <div class="custom-item">
+                                    <div class="custom-item-content">
+                                        <strong>Nettoyer l'appartement</strong>
+                                        <br><small class="text-muted">Aspirateur et ménage général</small>
                                     </div>
+                                    <button class="btn btn-sm btn-outline-danger" onclick="removeCustomItem(this)">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
                                 </div>
-                            </div>
-                            <div class="task-item">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div class="flex-grow-1">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" id="task4">
-                                            <label class="form-check-label" for="task4">
-                                                <strong>Préparer cadeau d'anniversaire</strong>
-                                                <br><small>Emballer le cadeau et écrire la carte</small>
-                                                <br><small class="text-muted">Ajouté il y a 3 jours • Échéance : 22/01/2024</small>
-                                            </label>
-                                        </div>
+                                <div class="custom-item">
+                                    <div class="custom-item-content">
+                                        <strong>Préparer cadeau d'anniversaire</strong>
+                                        <br><small class="text-muted">Emballer le cadeau et écrire la carte</small>
                                     </div>
-                                </div>
-                            </div>
-                            <div class="task-item">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <div class="flex-grow-1">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" id="task5">
-                                            <label class="form-check-label" for="task5">
-                                                <strong>Planifier le week-end</strong>
-                                                <br><small>Choisir les activités et faire les réservations</small>
-                                                <br><small class="text-muted">Ajouté il y a 1 jour</small>
-                                            </label>
-                                        </div>
-                                    </div>
+                                    <button class="btn btn-sm btn-outline-danger" onclick="removeCustomItem(this)">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-
-            <!-- Custom Lists Tab -->
-            <div id="custom-tab" class="tab-content">
-                <div class="add-form">
-                    <h3 data-i18n="createNewList">Créer une nouvelle liste</h3>
-                    <form id="custom-list-form">
-                        <div class="row">
-                            <div class="col-md-8 mb-3">
-                                <label class="form-label" data-i18n="listName">Nom de la liste</label>
-                                <input type="text" class="form-control" id="custom-list-name" data-i18n-placeholder="placeholderListName" placeholder="ex: Plans de week-end, Idées cadeaux, Destinations de rêve" required>
-                            </div>
-                            <div class="col-md-4 mb-3">
-                                <button type="submit" class="btn btn-purple mt-4">
-                                    <i class="fas fa-plus-circle me-2"></i><span data-i18n="createList">Créer la liste</span>
-                                </button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-
-                <div class="row" id="custom-lists-container">
                     <!-- Recipes List -->
                     <div class="col-lg-6 mb-4">
                         <div class="card">
@@ -1103,62 +879,9 @@
             </div>
         </div>
 
-        <!-- Data Chat View -->
-        <div id="data-chat" class="view-section">
-            <h1 class="mb-4" data-i18n="chatWithData">Discuter avec vos données</h1>
-            <div class="card">
-                <div class="card-body">
-                    <div class="text-center py-5">
-                        <i class="fas fa-robot fa-4x text-muted mb-3"></i>
-                        <h3>Chat avec vos données</h3>
-                        <p class="text-muted">Cette fonctionnalité sera bientôt disponible ! Vous pourrez poser des questions sur vos dépenses, tâches et événements.</p>
-                        <p class="small">Bientôt disponible : "Combien avons-nous dépensé en épicerie ce mois ?" ou "Quelles tâches sont en retard ?"</p>
-                    </div>
-                </div>
-            </div>
-        </div>
 
-        <!-- Account View -->
-        <div id="account" class="view-section">
-            <h1 class="mb-4"><i class="fas fa-user me-2"></i><span data-i18n="accountSettings">Paramètres du compte</span></h1>
-            <div class="row">
-                <div class="col-md-8">
-                    <div class="card">
-                        <div class="card-header">
-                            <span data-i18n="profile">Profil</span>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label" data-i18n="yourName">Votre nom</label>
-                                    <input type="text" class="form-control" placeholder="Votre nom">
-                                </div>
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label" data-i18n="partnerName">Nom du partenaire</label>
-                                    <input type="text" class="form-control" placeholder="Nom du partenaire">
-                                </div>
-                            </div>
-                            <button class="btn btn-purple" data-i18n="saveChanges">Sauvegarder</button>
-                        </div>
-                    </div>
-                    
-                    <div class="card mt-4">
-                        <div class="card-header">
-                            <span data-i18n="language">Langue</span>
-                        </div>
-                        <div class="card-body">
-                            <p class="text-muted" data-i18n="languageDescription">Choisissez votre langue préférée pour l'interface.</p>
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" id="languageSwitch" onclick="i18n.toggleLanguage()">
-                                <label class="form-check-label" for="languageSwitch">
-                                    <span id="currentLang">FR</span> / <span id="otherLang">EN</span>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+
+
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -1167,3 +890,4 @@
     <script src="app.js"></script>
 </body>
 </html>
+ 
