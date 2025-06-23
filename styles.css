@@ -60,10 +60,6 @@ body {
     margin-bottom: 20px;
 }
 
-.card:hover {
-    transform: translateY(-5px);
-}
-
 .card-header {
     background: linear-gradient(135deg, var(--primary-red), var(--light-red));
     color: white;
@@ -100,13 +96,35 @@ body {
     display: none;
 }
 
-.task-item, .event-item, .expense-item {
+.task-item, .event-item {
     padding: 10px;
     border-left: 4px solid var(--primary-red);
     background: white;
     margin-bottom: 10px;
     border-radius: 5px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.event-item {
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.event-item:hover {
+    background-color: var(--background-light);
+}
+
+.expense-item {
+    padding: 8px 12px;
+    border-left: 4px solid var(--primary-red);
+    background: white;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.expense-item strong, .expense-item .fw-bold {
+    font-size: 1.1rem;
 }
 
 .btn-complete {

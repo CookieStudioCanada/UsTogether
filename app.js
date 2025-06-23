@@ -130,8 +130,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-
-
     // Grocery form
     const groceryForm = document.getElementById('grocery-form');
     if (groceryForm) {
@@ -158,14 +156,16 @@ document.addEventListener('DOMContentLoaded', function() {
             const date = document.getElementById('event-date').value;
             const time = document.getElementById('event-time').value;
             const description = document.getElementById('event-description').value;
-            
+
             if (name && date) {
-                // Combine date and time, or use just date if no time provided
                 const datetime = time ? `${date}T${time}` : `${date}T00:00`;
-                addEventToList(name, datetime, description, time ? true : false);
+                addEventToList(name, datetime, description, !!time);
+                
                 this.reset();
-                // Regenerate calendar to show new event
+                
                 generateCalendar(currentMonth, currentYear);
+                loadExistingEvents();
+                loadDashboardEvents();
             }
         });
     }
@@ -190,6 +190,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Load existing events into the UI
     loadExistingEvents();
+    loadDashboardEvents();
     
     // Initialize calendar with current month
     generateCalendar(currentMonth, currentYear);
@@ -345,45 +346,38 @@ function initializeSampleEvents() {
     // Only add sample events if none exist
     if (existingEvents.length === 0) {
         const today = new Date();
+        const currentYear = today.getFullYear();
         const sampleEvents = [
             {
                 id: Date.now() + 1,
-                name: 'Soirée cinéma',
-                datetime: new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1, 20, 0).toISOString().slice(0, 16),
-                description: 'Regarder le nouveau film ensemble',
+                name: 'Shower à Ced',
+                datetime: new Date(currentYear, 5, 28, 14, 0).toISOString().slice(0, 16), // June 28th
+                description: 'Fête pour le bébé de Cédric',
                 hasTime: true,
                 timestamp: new Date().toISOString()
             },
             {
                 id: Date.now() + 2,
-                name: 'Dîner d\'anniversaire',
-                datetime: new Date(today.getFullYear(), today.getMonth(), today.getDate() + 3, 19, 30).toISOString().slice(0, 16),
-                description: 'Célébrer notre anniversaire de rencontre',
+                name: 'Enterrement vie de jeune garçon',
+                datetime: new Date(currentYear, 6, 5, 19, 0).toISOString().slice(0, 16), // July 5th
+                description: 'Soirée pour l\'EVG de Marc',
                 hasTime: true,
                 timestamp: new Date().toISOString()
             },
             {
                 id: Date.now() + 3,
-                name: 'Cours de yoga ensemble',
-                datetime: new Date(today.getFullYear(), today.getMonth(), today.getDate() + 6, 10, 0).toISOString().slice(0, 16),
-                description: 'Séance de yoga en couple',
+                name: 'Fête Blanche chez Michel',
+                datetime: new Date(currentYear, 6, 12).toISOString().slice(0, 16), // July 12th
+                description: 'Fête Blanche chez Michel',
                 hasTime: true,
                 timestamp: new Date().toISOString()
             },
             {
                 id: Date.now() + 4,
-                name: 'Week-end romantique',
-                datetime: new Date(today.getFullYear(), today.getMonth(), today.getDate() + 12).toISOString().slice(0, 10) + 'T00:00',
-                description: 'Escapade romantique à la montagne',
+                name: 'Amsterdam',
+                datetime: new Date(currentYear, 6, 13).toISOString().slice(0, 10) + 'T00:00', // July 13th
+                description: 'Départ pour Amsterdam',
                 hasTime: false,
-                timestamp: new Date().toISOString()
-            },
-            {
-                id: Date.now() + 5,
-                name: 'Visite chez les parents',
-                datetime: new Date(today.getFullYear(), today.getMonth(), today.getDate() + 8, 14, 0).toISOString().slice(0, 16),
-                description: 'Déjeuner dominical en famille',
-                hasTime: true,
                 timestamp: new Date().toISOString()
             }
         ];
@@ -398,26 +392,36 @@ function loadExistingEvents() {
     const events = JSON.parse(localStorage.getItem('events') || '[]');
     const eventsList = document.getElementById('events-list');
     
-    if (eventsList && events.length > 0) {
+    if (eventsList) {
         // Clear existing events in the UI
         eventsList.innerHTML = '';
         
-        // Sort events by date (earliest first)
-        events.sort((a, b) => new Date(a.datetime) - new Date(b.datetime));
-        
-        events.forEach(event => {
+        // Filter for upcoming events and sort them
+        const upcomingEvents = events
+            .filter(event => new Date(event.datetime) >= new Date())
+            .sort((a, b) => new Date(a.datetime) - new Date(b.datetime));
+
+        if (upcomingEvents.length === 0) {
+            eventsList.innerHTML = '<div class="text-center text-muted p-3">Aucun événement à venir.</div>';
+            return;
+        }
+
+        upcomingEvents.forEach(event => {
             const eventDate = new Date(event.datetime);
-            const formattedDate = event.hasTime ? 
-                eventDate.toLocaleDateString() + ', ' + eventDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) :
-                eventDate.toLocaleDateString();
-            
+            const dateOptions = { year: 'numeric', month: '2-digit', day: '2-digit' };
+            const formattedDate = event.hasTime 
+                ? eventDate.toLocaleDateString('fr-CA', dateOptions) + ', ' + eventDate.toLocaleTimeString('en-US', {hour: 'numeric', minute:'2-digit', hour12: true})
+                : eventDate.toLocaleDateString('fr-CA', dateOptions);
+
             const eventItem = document.createElement('div');
             eventItem.className = 'event-item';
+            eventItem.setAttribute('onclick', `editEvent(${event.id})`);
+            
             eventItem.innerHTML = `
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
                         <strong>${event.name}</strong>
-                        <br><small><i class="fas fa-${event.hasTime ? 'clock' : 'calendar'}"></i> ${formattedDate}</small>
+                        <br><small><i class="fas fa-${event.hasTime ? 'clock' : 'calendar-alt'}"></i> ${formattedDate}</small>
                         ${event.description ? `<br><small class="text-muted">${event.description}</small>` : ''}
                     </div>
                 </div>
@@ -460,8 +464,6 @@ function showView(viewId) {
         toggleSidebar();
     }
 }
-
-
 
 // Mobile sidebar toggle
 function toggleSidebar() {
@@ -533,8 +535,6 @@ function addExpenseToList(description, amount, category, payer, date, recurrence
     `;
     expensesList.insertBefore(newExpense, expensesList.firstChild);
 }
-
-
 
 function addGroceryItem(item, selectedCategory = '') {
     // Auto-detect category if none selected
@@ -692,7 +692,7 @@ function detectGroceryCategory(item) {
     const itemLower = item.toLowerCase();
     
     // Fruits/Légumes
-    if (itemLower.match(/\b(pomme|poire|banane|orange|citron|lime|fraise|raisin|ananas|melon|pastèque|pêche|abricot|kiwi|mangue|avocat|tomate|carotte|pomme de terre|oignon|ail|poivron|courgette|aubergine|brocoli|chou|épinard|laitue|salade|concombre|radis|betterave|navet|céleri|persil|coriandre|basilic|menthe|légume|fruit|bio|organique)\b/)) {
+    if (itemLower.match(/\b(pomme|poire|banane|orange|citron|lime|fraise|raisin|ananas|melon|pastèque|pêche|abricot|kiwi|mangue|avocat|tomate|carotte|pomme de terre|oignon|ail|poivron|courgette|aubergine|brocoli|chou|épinard|laitue|salade|concombre|radis|betterave|navet|champignon|céleri|persil|coriandre|basilic|menthe|légume|fruit|bio|organique)\b/)) {
         return 'fruits-legumes';
     }
     
@@ -755,7 +755,27 @@ function initializeGroceryItems() {
             { id: 'grocery3', name: 'Pommes de terre - 2 kg', category: 'fruits-legumes', completed: false },
             { id: 'grocery4', name: 'Saumon frais - 400g', category: 'viandes', completed: false },
             { id: 'grocery5', name: 'Œufs - 12 unités', category: 'laitiers', completed: true },
-            { id: 'grocery6', name: 'Fromage de chèvre', category: 'laitiers', completed: false }
+            { id: 'grocery6', name: 'Fromage de chèvre', category: 'laitiers', completed: false },
+            { id: 'grocery7', name: 'Bananes', category: 'fruits-legumes', completed: false },
+            { id: 'grocery8', name: 'Avocats', category: 'fruits-legumes', completed: false },
+            { id: 'grocery9', name: 'Tomates cerises', category: 'fruits-legumes', completed: false },
+            { id: 'grocery10', name: 'Épinards frais', category: 'fruits-legumes', completed: false },
+            { id: 'grocery11', name: 'Poitrines de poulet', category: 'viandes', completed: false },
+            { id: 'grocery12', name: 'Steak de boeuf', category: 'viandes', completed: false },
+            { id: 'grocery13', name: 'Baguette tradition', category: 'boulangerie', completed: false },
+            { id: 'grocery14', name: 'Croissants x4', category: 'boulangerie', completed: false },
+            { id: 'grocery15', name: 'Yogourt grec', category: 'laitiers', completed: false },
+            { id: 'grocery16', name: 'Beurre salé', category: 'laitiers', completed: false },
+            { id: 'grocery17', name: 'Pizza congelée', category: 'congeles', completed: false },
+            { id: 'grocery18', name: 'Crème glacée vanille', category: 'congeles', completed: false },
+            { id: 'grocery19', name: 'Pâtes (Spaghetti)', category: 'epicerie', completed: false },
+            { id: 'grocery20', name: 'Sauce tomate', category: 'epicerie', completed: false },
+            { id: 'grocery21', name: 'Huile d\'olive', category: 'epicerie', completed: false },
+            { id: 'grocery22', name: 'Café en grains', category: 'epicerie', completed: false },
+            { id: 'grocery23', name: 'Shampoing', category: 'autre', completed: false },
+            { id: 'grocery24', name: 'Papier toilette', category: 'autre', completed: false },
+            { id: 'grocery25', name: 'Vin rouge', category: 'epicerie', completed: false },
+            { id: 'grocery26', name: 'Céréales', category: 'boulangerie', completed: false }
         ];
         
         localStorage.setItem('groceryItems', JSON.stringify(sampleItems));
@@ -954,8 +974,6 @@ document.addEventListener('click', function(e) {
     }
 });
 
-
-
 // Post-it editing functionality
 function editPostIt(postItElement) {
     const contentElement = postItElement.querySelector('.post-it-content');
@@ -1029,4 +1047,113 @@ document.addEventListener('DOMContentLoaded', function() {
             // Update any specific UI elements if needed
         };
     }
-}); 
+});
+
+function editEvent(eventId) {
+    const events = JSON.parse(localStorage.getItem('events') || '[]');
+    const eventToEdit = events.find(event => event.id === eventId);
+
+    if (eventToEdit) {
+        // Populate the modal form
+        document.getElementById('edit-event-id').value = eventToEdit.id;
+        document.getElementById('edit-event-name').value = eventToEdit.name;
+        document.getElementById('edit-event-description').value = eventToEdit.description;
+
+        const eventDate = new Date(eventToEdit.datetime);
+        document.getElementById('edit-event-date').value = eventDate.toISOString().split('T')[0];
+        
+        if (eventToEdit.hasTime) {
+            document.getElementById('edit-event-time').value = eventDate.toTimeString().split(' ')[0].substring(0, 5);
+        } else {
+            document.getElementById('edit-event-time').value = '';
+        }
+
+        // Show the modal
+        const modal = new bootstrap.Modal(document.getElementById('editEventModal'));
+        modal.show();
+    }
+}
+
+function saveEditedEvent() {
+    const eventId = document.getElementById('edit-event-id').value;
+    const name = document.getElementById('edit-event-name').value;
+    const date = document.getElementById('edit-event-date').value;
+    const time = document.getElementById('edit-event-time').value;
+    const description = document.getElementById('edit-event-description').value;
+
+    if (eventId && name && date) {
+        let events = JSON.parse(localStorage.getItem('events') || '[]');
+        const eventIndex = events.findIndex(event => event.id === parseInt(eventId));
+        
+        if (eventIndex !== -1) {
+            const datetime = time ? `${date}T${time}` : `${date}T00:00`;
+            events[eventIndex].name = name;
+            events[eventIndex].datetime = datetime;
+            events[eventIndex].description = description;
+            events[eventIndex].hasTime = !!time;
+            localStorage.setItem('events', JSON.stringify(events));
+
+            // Close modal and refresh UI
+            const modal = bootstrap.Modal.getInstance(document.getElementById('editEventModal'));
+            modal.hide();
+            
+            generateCalendar(currentMonth, currentYear);
+            loadExistingEvents();
+            loadDashboardEvents();
+        }
+    }
+}
+
+function deleteEvent() {
+    const eventId = document.getElementById('edit-event-id').value;
+    if (confirm(i18n.t('deleteConfirmation'))) {
+        let events = JSON.parse(localStorage.getItem('events') || '[]');
+        const filteredEvents = events.filter(event => event.id !== parseInt(eventId));
+        localStorage.setItem('events', JSON.stringify(filteredEvents));
+
+        // Close modal and refresh UI
+        const modal = bootstrap.Modal.getInstance(document.getElementById('editEventModal'));
+        modal.hide();
+
+        generateCalendar(currentMonth, currentYear);
+        loadExistingEvents();
+        loadDashboardEvents();
+    }
+}
+
+function loadDashboardEvents() {
+    const eventsList = document.getElementById('dashboard-events-list');
+    if (!eventsList) return;
+
+    const events = JSON.parse(localStorage.getItem('events') || '[]');
+    
+    // Filter for upcoming events, sort by date, and take the first 4
+    const upcomingEvents = events
+        .filter(event => new Date(event.datetime) >= new Date())
+        .sort((a, b) => new Date(a.datetime) - new Date(b.datetime))
+        .slice(0, 4);
+
+    eventsList.innerHTML = ''; // Clear previous content
+
+    if (upcomingEvents.length === 0) {
+        eventsList.innerHTML = '<div class="text-center text-muted p-3">Aucun événement à venir.</div>';
+        return;
+    }
+
+    upcomingEvents.forEach(event => {
+        const eventDate = new Date(event.datetime);
+        const formattedDate = event.hasTime 
+            ? eventDate.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long' }) + ' ' + eventDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+            : eventDate.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+
+        const eventItem = document.createElement('div');
+        eventItem.className = 'mini-event';
+        eventItem.setAttribute('onclick', `editEvent(${event.id})`);
+        
+        eventItem.innerHTML = `
+            <strong>${event.name}</strong>
+            <br><small>${formattedDate}</small>
+        `;
+        eventsList.appendChild(eventItem);
+    });
+} 
