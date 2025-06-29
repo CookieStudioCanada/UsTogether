@@ -368,12 +368,6 @@ body {
 }
 
 /* Enhanced Calendar Styles */
-.event-form {
-    background: var(--lighter-red);
-    border-radius: 10px;
-    padding: 15px;
-    margin-top: 20px;
-}
 
 .mini-event {
     background: white;
@@ -746,52 +740,12 @@ body {
     background: linear-gradient(135deg, #fef7f7 0%, #fff 100%);
 }
 
-/* Grocery Styles */
-.grocery-header {
-    background: linear-gradient(135deg, var(--primary-red), var(--light-red));
-    color: white;
-    padding: 1.5rem;
-    border-radius: 15px 15px 0 0;
-    margin-bottom: 0;
-}
-
-.grocery-header-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.grocery-header h2 {
-    margin: 0;
-    font-size: 1.3rem;
-    font-weight: 600;
-}
-
-.grocery-filter .btn {
+/* Grocery and Expense Filter Styles */
+.grocery-filter .btn,
+.expense-filter .btn {
     background: rgba(255, 255, 255, 0.2);
     border: 1px solid rgba(255, 255, 255, 0.3);
     color: white;
-}
-
-.grocery-content {
-    background: white;
-    padding: 1.5rem;
-    border-radius: 0 0 15px 15px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.grocery-form {
-    margin-bottom: 2rem;
-}
-
-.grocery-form .form-group {
-    margin-bottom: 1rem;
-}
-
-.grocery-form .form-label {
-    font-weight: 600;
-    margin-bottom: 0.5rem;
-    color: #333;
 }
 
 .grocery-category-section {
@@ -828,19 +782,16 @@ body {
     margin-top: 1.5rem;
 }
 
+.expense-export {
+    margin-top: 1.5rem;
+}
+
 /* Mobile adjustments */
 @media (max-width: 768px) {
-    .grocery-header-content {
-        flex-direction: column;
-        text-align: center;
-    }
-    
-    .grocery-header h2 {
-        margin-bottom: 1rem;
-    }
-    
-    .grocery-content {
-        padding: 1rem;
+    .grocery-filter .btn,
+    .expense-filter .btn {
+        font-size: 0.9rem;
+        padding: 0.375rem 0.75rem;
     }
 }
 

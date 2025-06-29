@@ -360,7 +360,7 @@ function initializeSampleEvents() {
                 id: Date.now() + 2,
                 name: 'Enterrement vie de jeune garçon',
                 datetime: new Date(currentYear, 6, 5, 19, 0).toISOString().slice(0, 16), // July 5th
-                description: 'Soirée pour l\'EVG de Marc',
+                description: 'Soirée pour l\'EVG de Max',
                 hasTime: true,
                 timestamp: new Date().toISOString()
             },
@@ -730,9 +730,9 @@ function filterGroceryByCategory(category) {
     
     // Update dropdown button text
     const dropdownButton = document.querySelector('.grocery-filter .dropdown-toggle');
-    if (dropdownButton && event && event.target) {
-        const selectedText = event.target.textContent;
-        dropdownButton.innerHTML = `<i class="fas fa-filter me-1"></i>${selectedText}`;
+    if (dropdownButton) {
+        const categoryDisplayText = getGroceryCategoryDisplayText(category);
+        dropdownButton.innerHTML = `<i class="fas fa-filter me-1"></i>${categoryDisplayText}`;
     }
     
     categorySections.forEach(section => {
@@ -742,6 +742,21 @@ function filterGroceryByCategory(category) {
             section.style.display = 'none';
         }
     });
+}
+
+function getGroceryCategoryDisplayText(category) {
+    const categoryTexts = {
+        'all': 'Catégories',
+        '': 'Catégories',
+        'fruits-legumes': '🍎 Fruits/Légumes',
+        'boulangerie': '🥖 Boulangerie',
+        'viandes': '🥩 Viandes',
+        'congeles': '🧊 Congelés',
+        'laitiers': '🥛 Laitiers',
+        'epicerie': '🛒 Épicerie',
+        'autre': '📦 Autre'
+    };
+    return categoryTexts[category] || 'Catégories';
 }
 
 function initializeGroceryItems() {
@@ -811,17 +826,37 @@ function exportGroceryList() {
     alert('📝 Fonctionnalité d\'export de liste d\'épicerie à implémenter pour générer des listes partageables');
 }
 
-function filterByCategory() {
-    const filter = document.getElementById('category-filter').value;
+function filterByCategory(category = '') {
     const expenses = document.querySelectorAll('.expense-item');
     
+    // Update dropdown button text
+    const dropdownButton = document.querySelector('.expense-filter .dropdown-toggle');
+    if (dropdownButton) {
+        const categoryDisplayText = getCategoryDisplayText(category);
+        dropdownButton.innerHTML = `<i class="fas fa-filter me-1"></i>${categoryDisplayText}`;
+    }
+    
     expenses.forEach(expense => {
-        if (!filter || expense.getAttribute('data-category') === filter) {
+        if (!category || expense.getAttribute('data-category') === category) {
             expense.style.display = 'block';
         } else {
             expense.style.display = 'none';
         }
     });
+}
+
+function getCategoryDisplayText(category) {
+    const categoryTexts = {
+        '': 'Catégories',
+        'epicerie': '🛒 Épicerie',
+        'pret-maison': '🏠 Prêt maison',
+        'restaurants': '🍽️ Restaurants',
+        'transport': '🚗 Transport',
+        'divertissement': '🎬 Divertissement',
+        'depenses-maison': '🏡 Dépenses maison',
+        'autre': '📦 Autre'
+    };
+    return categoryTexts[category] || 'Catégories';
 }
 
 function showGroceryList() {

@@ -196,8 +196,8 @@
                 <div class="col-lg-5 mb-4">
                     <div class="love-notes-container">
                         <div class="post-it editable-post-it" onclick="editPostIt(this)">
-                            <div class="post-it-content" contenteditable="false">N'oublie pas que tu es fantastique ! J'ai hâte de te voir ce soir 😘</div>
-                            <div class="post-it-author">- Ton Amour ❤️</div>
+                            <div class="post-it-content" contenteditable="false">Je t'aime baby shark 😘</div>
+                            <div class="post-it-author">- Amou ❤️</div>
                             <div class="post-it-edit-hint">
                                 <i class="fas fa-edit"></i> Cliquez pour modifier
                             </div>
@@ -279,8 +279,7 @@
             
             <!-- Add New Expense Form -->
             <div class="add-form">
-                <h3 data-i18n="addNewExpense">Ajouter une nouvelle dépense</h3>
-                <p class="text-muted mb-4" data-i18n="expenseDetails">Entrez les détails d'une dépense partagée.</p>
+                <h3 class="fw-bold" data-i18n="addExpenseTitle">Ajouter une dépense</h3>
                 <form id="expense-form">
                     <div class="row">
                         <div class="col-md-8 mb-3">
@@ -340,20 +339,20 @@
                     <div class="card">
                         <div class="card-header">
                             <span data-i18n="recentExpenses">Dépenses récentes</span>
-                            <div>
-                                <button class="export-btn me-2" onclick="exportExpenses()">
-                                    <i class="fas fa-download me-1"></i><span data-i18n="export">Exporter</span>
+                            <div class="expense-filter">
+                                <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                    <i class="fas fa-filter me-1"></i><span data-i18n="allCategories">Catégories</span>
                                 </button>
-                                <select class="form-select d-inline-block w-auto" id="category-filter" onchange="filterByCategory()">
-                                    <option value="" data-i18n="allCategories">Catégories</option>
-                                    <option value="epicerie">Épicerie</option>
-                                    <option value="pret-maison">Prêt maison</option>
-                                    <option value="restaurants">Restaurants</option>
-                                    <option value="transport">Transport</option>
-                                    <option value="divertissement">Divertissement</option>
-                                    <option value="depenses-maison">Dépenses maison</option>
-                                    <option value="autre">Autre</option>
-                                </select>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="#" onclick="filterByCategory('')"><span data-i18n="allCategories">Catégories</span></a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="filterByCategory('epicerie')">🛒 Épicerie</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="filterByCategory('pret-maison')">🏠 Prêt maison</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="filterByCategory('restaurants')">🍽️ Restaurants</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="filterByCategory('transport')">🚗 Transport</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="filterByCategory('divertissement')">🎬 Divertissement</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="filterByCategory('depenses-maison')">🏡 Dépenses maison</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="filterByCategory('autre')">📦 Autre</a></li>
+                                </ul>
                             </div>
                         </div>
                         <div class="card-body">
@@ -363,7 +362,7 @@
                                         <div>
                                             <strong>Costco</strong>
                                             <span class="category-badge category-epicerie">🛒 Épicerie</span>
-                                            <br><small>Payé par Vous • Partagé équitablement • 15/01/2024</small>
+                                            <br><small>Payé par Vous • 15/01/2024</small>
                                         </div>
                                         <div class="text-end">
                                             <div class="fw-bold">$185.50</div>
@@ -376,7 +375,7 @@
                                         <div>
                                             <strong>Billets de cinéma</strong>
                                             <span class="category-badge category-divertissement">🎬 Divertissement</span>
-                                            <br><small>Payé par Partenaire • Partagé équitablement • 14/01/2024</small>
+                                            <br><small>Payé par Partenaire • 14/01/2024</small>
                                         </div>
                                         <div class="text-end">
                                             <div class="fw-bold">$28.00</div>
@@ -389,7 +388,7 @@
                                         <div>
                                             <strong>Uber vers l'aéroport</strong>
                                             <span class="category-badge category-transport">🚗 Transport</span>
-                                            <br><small>Payé par Vous • Partagé équitablement • 12/01/2024</small>
+                                            <br><small>Payé par Vous • 12/01/2024</small>
                                         </div>
                                         <div class="text-end">
                                             <div class="fw-bold">$45.25</div>
@@ -402,7 +401,7 @@
                                         <div>
                                             <strong>Facture d'électricité</strong>
                                             <span class="category-badge category-depenses-maison">🏡 Dépenses maison</span>
-                                            <br><small>Payé par Partenaire • Partagé équitablement • 10/01/2024</small>
+                                            <br><small>Payé par Partenaire • 10/01/2024</small>
                                         </div>
                                         <div class="text-end">
                                             <div class="fw-bold">$120.00</div>
@@ -415,7 +414,7 @@
                                         <div>
                                             <strong>Restaurant italien</strong>
                                             <span class="category-badge category-restaurants">🍽️ Restaurants</span>
-                                            <br><small>Payé par Vous • Partagé équitablement • 08/01/2024</small>
+                                            <br><small>Payé par Vous • 08/01/2024</small>
                                         </div>
                                         <div class="text-end">
                                             <div class="fw-bold">$67.80</div>
@@ -428,7 +427,7 @@
                                         <div>
                                             <strong>IGA</strong>
                                             <span class="category-badge category-epicerie">🛒 Épicerie</span>
-                                            <br><small>Payé par Partenaire • Partagé équitablement • 05/01/2024</small>
+                                            <br><small>Payé par Partenaire • 05/01/2024</small>
                                         </div>
                                         <div class="text-end">
                                             <div class="fw-bold">$76.20</div>
@@ -441,7 +440,7 @@
                                         <div>
                                             <strong>Essence Shell</strong>
                                             <span class="category-badge category-transport">🚗 Transport</span>
-                                            <br><small>Payé par Vous • Partagé équitablement • 04/01/2024</small>
+                                            <br><small>Payé par Vous • 04/01/2024</small>
                                         </div>
                                         <div class="text-end">
                                             <div class="fw-bold">$55.00</div>
@@ -454,7 +453,7 @@
                                         <div>
                                             <strong>Sushi Shop</strong>
                                             <span class="category-badge category-restaurants">🍽️ Restaurants</span>
-                                            <br><small>Payé par Partenaire • Partagé équitablement • 02/01/2024</small>
+                                            <br><small>Payé par Partenaire • 02/01/2024</small>
                                         </div>
                                         <div class="text-end">
                                             <div class="fw-bold">$48.90</div>
@@ -467,7 +466,7 @@
                                         <div>
                                             <strong>Netflix</strong>
                                             <span class="category-badge category-divertissement">🎬 Divertissement</span>
-                                            <br><small>Payé par Vous • Partagé équitablement • 01/01/2024 • Chaque mois</small>
+                                            <br><small>Payé par Vous • 01/01/2024 • Chaque mois</small>
                                         </div>
                                         <div class="text-end">
                                             <div class="fw-bold">$16.99</div>
@@ -480,7 +479,7 @@
                                         <div>
                                             <strong>Internet Bell</strong>
                                             <span class="category-badge category-depenses-maison">🏡 Dépenses maison</span>
-                                            <br><small>Payé par Partenaire • Partagé équitablement • 30/12/2023</small>
+                                            <br><small>Payé par Partenaire • 30/12/2023</small>
                                         </div>
                                         <div class="text-end">
                                             <div class="fw-bold">$89.99</div>
@@ -493,7 +492,7 @@
                                         <div>
                                             <strong>Maxi</strong>
                                             <span class="category-badge category-epicerie">🛒 Épicerie</span>
-                                            <br><small>Payé par Vous • Partagé équitablement • 28/12/2023</small>
+                                            <br><small>Payé par Vous • 28/12/2023</small>
                                         </div>
                                         <div class="text-end">
                                             <div class="fw-bold">$112.30</div>
@@ -506,7 +505,7 @@
                                         <div>
                                             <strong>Stationnement</strong>
                                             <span class="category-badge category-transport">🚗 Transport</span>
-                                            <br><small>Payé par Partenaire • Partagé équitablement • 27/12/2023</small>
+                                            <br><small>Payé par Partenaire • 27/12/2023</small>
                                         </div>
                                         <div class="text-end">
                                             <div class="fw-bold">$15.00</div>
@@ -519,7 +518,7 @@
                                         <div>
                                             <strong>Café Starbucks</strong>
                                             <span class="category-badge category-restaurants">🍽️ Restaurants</span>
-                                            <br><small>Payé par Vous • Partagé équitablement • 26/12/2023</small>
+                                            <br><small>Payé par Vous • 26/12/2023</small>
                                         </div>
                                         <div class="text-end">
                                             <div class="fw-bold">$12.50</div>
@@ -532,7 +531,7 @@
                                         <div>
                                             <strong>Spotify</strong>
                                             <span class="category-badge category-divertissement">🎬 Divertissement</span>
-                                            <br><small>Payé par Partenaire • Partagé équitablement • 25/12/2023 • Chaque mois</small>
+                                            <br><small>Payé par Partenaire • 25/12/2023 (Chaque mois)</small>
                                         </div>
                                         <div class="text-end">
                                             <div class="fw-bold">$9.99</div>
@@ -545,7 +544,7 @@
                                         <div>
                                             <strong>Rona</strong>
                                             <span class="category-badge category-depenses-maison">🏡 Dépenses maison</span>
-                                            <br><small>Payé par Vous • Partagé équitablement • 22/12/2023</small>
+                                            <br><small>Payé par Vous • 22/12/2023</small>
                                         </div>
                                         <div class="text-end">
                                             <div class="fw-bold">$75.40</div>
@@ -558,7 +557,7 @@
                                         <div>
                                             <strong>Provigo</strong>
                                             <span class="category-badge category-epicerie">🛒 Épicerie</span>
-                                            <br><small>Payé par Partenaire • Partagé équitablement • 20/12/2023</small>
+                                            <br><small>Payé par Partenaire • 20/12/2023</small>
                                         </div>
                                         <div class="text-end">
                                             <div class="fw-bold">$95.60</div>
@@ -571,7 +570,7 @@
                                         <div>
                                             <strong>Passe de bus</strong>
                                             <span class="category-badge category-transport">🚗 Transport</span>
-                                            <br><small>Payé par Vous • Partagé équitablement • 18/12/2023</small>
+                                            <br><small>Payé par Vous • 18/12/2023</small>
                                         </div>
                                         <div class="text-end">
                                             <div class="fw-bold">$90.00</div>
@@ -584,7 +583,7 @@
                                         <div>
                                             <strong>Pizzeria</strong>
                                             <span class="category-badge category-restaurants">🍽️ Restaurants</span>
-                                            <br><small>Payé par Partenaire • Partagé équitablement • 17/12/2023</small>
+                                            <br><small>Payé par Partenaire • 17/12/2023</small>
                                         </div>
                                         <div class="text-end">
                                             <div class="fw-bold">$32.00</div>
@@ -597,7 +596,7 @@
                                         <div>
                                             <strong>Home Depot</strong>
                                             <span class="category-badge category-depenses-maison">🏡 Dépenses maison</span>
-                                            <br><small>Payé par Vous • Partagé équitablement • 15/12/2023</small>
+                                            <br><small>Payé par Vous • 15/12/2023</small>
                                         </div>
                                         <div class="text-end">
                                             <div class="fw-bold">$150.00</div>
@@ -610,7 +609,7 @@
                                         <div>
                                             <strong>Pharmacie</strong>
                                             <span class="category-badge category-autre">📦 Autre</span>
-                                            <br><small>Payé par Partenaire • Partagé équitablement • 14/12/2023</small>
+                                            <br><small>Payé par Partenaire • 14/12/2023</small>
                                         </div>
                                         <div class="text-end">
                                             <div class="fw-bold">$42.15</div>
@@ -662,6 +661,13 @@
                     </div>
                 </div>
             </div>
+            
+            <!-- Export button (at bottom) -->
+            <div class="expense-export mt-4">
+                <button class="btn btn-red w-100" onclick="exportExpenses()">
+                    <i class="fas fa-download me-2"></i><span data-i18n="export">Exporter</span>
+                </button>
+            </div>
         </div>
 
         <!-- Calendar View -->
@@ -669,10 +675,51 @@
             <h1><i class="fas fa-calendar-alt me-3 text-red-icon"></i><span data-i18n="calendar">Calendrier</span></h1>
             <p class="text-muted mb-4" data-i18n="calendarSubtitle">Planifiez et visualisez vos événements communs.</p>
 
+            <!-- Add Event Form -->
+            <div class="add-form">
+                <h3 class="fw-bold" data-i18n="addEventTitle">Ajouter un événement</h3>
+                <form id="event-form">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label" data-i18n="eventName">Nom de l'événement</label>
+                            <input type="text" class="form-control" id="event-name" data-i18n-placeholder="placeholderEvent" placeholder="ex: Dîner romantique" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label" data-i18n="date">Date</label>
+                            <input type="date" class="form-control" id="event-date" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label" data-i18n="timeOptional">Heure (optionnelle)</label>
+                            <input type="time" class="form-control" id="event-time">
+                        </div>
+                        <div class="col-12 mb-3">
+                            <label class="form-label" data-i18n="descriptionOptional">Description (optionnelle)</label>
+                            <textarea class="form-control" id="event-description" rows="2" data-i18n-placeholder="additionalDetails" placeholder="Détails supplémentaires..."></textarea>
+                        </div>
+                        <div class="col-12 mb-3 text-center">
+                            <button type="submit" class="btn btn-red">
+                                <i class="fas fa-plus-circle me-2"></i><span data-i18n="addEvent">Ajouter un événement</span>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
             <div class="row">
                 <div class="col-lg-8 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <span data-i18n="upcomingEvents">Événements à venir</span>
+                        </div>
+                        <div class="card-body">
+                            <div id="events-list">
+                                <!-- Les événements réels seront ajoutés ici par JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
                     <div class="calendar-widget">
-                        <h3 class="mb-3" data-i18n="calendarView">Vue du calendrier</h3>
                         <div class="calendar-header">
                             <button class="calendar-nav" onclick="changeMonth(-1)">
                                 <i class="fas fa-chevron-left"></i>
@@ -686,48 +733,6 @@
                             <!-- Calendar will be generated by JavaScript -->
                         </div>
                     </div>
-                    
-                    <!-- Add Event Form Below Calendar -->
-                    <div class="event-form">
-                        <h4 class="mb-3" data-i18n="addNewEvent">Ajouter un nouvel événement</h4>
-                        <form id="event-form">
-                            <div class="row">
-                                <div class="col-md-4 mb-3">
-                                    <label class="form-label" data-i18n="eventName">Nom de l'événement</label>
-                                    <input type="text" class="form-control" id="event-name" data-i18n-placeholder="placeholderEvent" placeholder="ex: Dîner romantique" required>
-                                </div>
-                                <div class="col-md-4 mb-3">
-                                    <label class="form-label" data-i18n="date">Date</label>
-                                    <input type="date" class="form-control" id="event-date" required>
-                                </div>
-                                <div class="col-md-4 mb-3">
-                                    <label class="form-label" data-i18n="timeOptional">Heure (optionnelle)</label>
-                                    <input type="time" class="form-control" id="event-time">
-                                </div>
-                                <div class="col-12 mb-3">
-                                    <label class="form-label" data-i18n="descriptionOptional">Description (optionnelle)</label>
-                                    <textarea class="form-control" id="event-description" rows="2" data-i18n-placeholder="additionalDetails" placeholder="Détails supplémentaires..."></textarea>
-                                </div>
-                                <div class="col-12 mb-3 text-center">
-                                    <button type="submit" class="btn btn-red">
-                                        <i class="fas fa-plus-circle me-2"></i><span data-i18n="addEvent">Ajouter un événement</span>
-                                    </button>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-                <div class="col-lg-4">
-                    <div class="card">
-                        <div class="card-header">
-                            <span data-i18n="upcomingEvents">Événements à venir</span>
-                        </div>
-                        <div class="card-body">
-                            <div id="events-list">
-                                <!-- Les événements réels seront ajoutés ici par JavaScript -->
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -737,55 +742,64 @@
             <h1><i class="fas fa-shopping-cart me-3 text-red-icon"></i><span data-i18n="groceryList">Liste d'épicerie</span></h1>
             <p class="text-muted mb-4" data-i18n="grocerySubtitle">Gérez votre liste de courses partagée.</p>
 
-            <div class="grocery-header">
-                <div class="grocery-header-content">
-                    <h2><i class="fas fa-list me-2"></i><span data-i18n="shoppingList">Liste de courses</span></h2>
-                    <div class="grocery-filter d-none d-md-block">
-                        <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-filter me-1"></i>Catégories
-                        </button>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#" onclick="filterGroceryByCategory('all')">Catégories</a></li>
-                            <li><a class="dropdown-item" href="#" onclick="filterGroceryByCategory('fruits-legumes')">Fruits/Légumes</a></li>
-                            <li><a class="dropdown-item" href="#" onclick="filterGroceryByCategory('boulangerie')">Boulangerie</a></li>
-                            <li><a class="dropdown-item" href="#" onclick="filterGroceryByCategory('viandes')">Viandes</a></li>
-                            <li><a class="dropdown-item" href="#" onclick="filterGroceryByCategory('congeles')">Congelés</a></li>
-                            <li><a class="dropdown-item" href="#" onclick="filterGroceryByCategory('laitiers')">Laitiers</a></li>
-                            <li><a class="dropdown-item" href="#" onclick="filterGroceryByCategory('epicerie')">Épicerie</a></li>
-                            <li><a class="dropdown-item" href="#" onclick="filterGroceryByCategory('autre')">Autre</a></li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
-            <div class="grocery-content">
-                <form id="grocery-form" class="grocery-form">
-                    <div class="form-group">
-                        <label class="form-label" data-i18n="item">Article</label>
-                        <input type="text" class="form-control" id="grocery-item" placeholder="ex: Lait" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" data-i18n="category">Catégorie</label>
-                        <select class="form-select" id="grocery-category">
-                            <option value="" data-i18n="autoDetect">Détection automatique</option>
-                            <option value="fruits-legumes">Fruits/Légumes</option>
-                            <option value="boulangerie">Boulangerie</option>
-                            <option value="viandes">Viandes</option>
-                            <option value="congeles">Congelés</option>
-                            <option value="laitiers">Laitiers</option>
-                            <option value="epicerie">Épicerie</option>
-                            <option value="autre">Autre</option>
-                        </select>
-                    </div>
-                    <div class="text-center">
-                        <button type="submit" class="btn btn-red">
-                            <i class="fas fa-plus me-2"></i><span data-i18n="addItem">Ajouter l'article</span>
-                        </button>
+            <!-- Add New Item Form -->
+            <div class="add-form">
+                <h3 class="fw-bold" data-i18n="addItemTitle">Ajouter un article</h3>
+                <form id="grocery-form">
+                    <div class="row">
+                        <div class="col-md-8 mb-3">
+                            <label class="form-label">Article</label>
+                            <input type="text" class="form-control" id="grocery-item" placeholder="ex: Lait" required>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Catégorie</label>
+                            <select class="form-select" id="grocery-category">
+                                <option value="">Détection automatique</option>
+                                <option value="fruits-legumes">🍎 Fruits/Légumes</option>
+                                <option value="boulangerie">🥖 Boulangerie</option>
+                                <option value="viandes">🥩 Viandes</option>
+                                <option value="congeles">🧊 Congelés</option>
+                                <option value="laitiers">🥛 Laitiers</option>
+                                <option value="epicerie">🛒 Épicerie</option>
+                                <option value="autre">📦 Autre</option>
+                            </select>
+                        </div>
+                        <div class="col-12 text-center">
+                            <button type="submit" class="btn btn-red">
+                                <i class="fas fa-plus-circle me-2"></i>Ajouter l'article
+                            </button>
+                        </div>
                     </div>
                 </form>
+            </div>
 
-                <div id="grocery-list">
-                    <!-- Items will be grouped by category -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <span data-i18n="shoppingList">Liste de courses</span>
+                            <div class="grocery-filter">
+                                <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                    <i class="fas fa-filter me-1"></i>Catégories
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="#" onclick="filterGroceryByCategory('all')">Catégories</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="filterGroceryByCategory('fruits-legumes')">🍎 Fruits/Légumes</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="filterGroceryByCategory('boulangerie')">🥖 Boulangerie</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="filterGroceryByCategory('viandes')">🥩 Viandes</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="filterGroceryByCategory('congeles')">🧊 Congelés</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="filterGroceryByCategory('laitiers')">🥛 Laitiers</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="filterGroceryByCategory('epicerie')">🛒 Épicerie</a></li>
+                                    <li><a class="dropdown-item" href="#" onclick="filterGroceryByCategory('autre')">📦 Autre</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div id="grocery-list">
+                                <!-- Items will be grouped by category -->
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -803,7 +817,7 @@
             <p class="text-muted mb-4" data-i18n="listsSubtitle">Créez et gérez vos listes partagées.</p>
 
             <div class="add-form">
-                <h3 data-i18n="createNewList">Créer une nouvelle liste</h3>
+                <h3 class="fw-bold" data-i18n="createNewList">Créer une nouvelle liste</h3>
                 <form id="custom-list-form">
                     <div class="row align-items-end">
                         <div class="col-md-8 mb-3 mb-md-0">
